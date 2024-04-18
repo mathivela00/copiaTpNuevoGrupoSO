@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     logger = iniciar_logger("memoria");
     log_info(logger, "Hola soy memoria");
 
+    log_destroy(logger);
     return 0;
 }

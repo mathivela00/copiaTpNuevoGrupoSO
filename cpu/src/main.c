@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     logger = iniciar_logger("cpu");
     log_info(logger, "Hola soy cpu");
     
+    log_destroy(logger);
     return 0;
 }

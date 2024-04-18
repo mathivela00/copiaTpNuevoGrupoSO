@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     logger = iniciar_logger("kernel");
     log_info(logger, "Hola soy kernel");
 
+    log_destroy(logger);
     return 0;
 }

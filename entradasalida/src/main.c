@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     logger = iniciar_logger("io");
     log_info(logger, "Hola soy entrada/salida");
 
+    log_destroy(logger);
     return 0;
 }
