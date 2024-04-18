@@ -33,37 +33,48 @@ int crear_conexion(char *ip, char *puerto)
                                 server_info->ai_protocol);
 
     // Ahora que tenemos el socket, vamos a conectarlo
-
+    /*
     if (connect(socket_cliente,
                 server_info->ai_addr,
                 server_info->ai_addrlen) == -1)
     {
         return -1;
-    }
+    }*/
+    connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 
     freeaddrinfo(server_info);
 
     return socket_cliente;
 }
 
-void enviar_mensaje(char *mensaje, int socket_cliente)
+void enviar_mensaje(char* mensaje, int socket_cliente, t_log* logger)
 {
-    t_paquete *paquete = malloc(sizeof(t_paquete));
+	t_paquete* paquete = malloc(sizeof(t_paquete));
 
-    paquete->codigo_operacion = MENSAJE;
-    paquete->buffer = malloc(sizeof(t_buffer));
-    paquete->buffer->size = strlen(mensaje) + 1;
-    paquete->buffer->stream = malloc(paquete->buffer->size);
-    memcpy(paquete->buffer->stream, mensaje, paquete->buffer->size);
+	paquete->codigo_operacion = MENSAJE;
+	paquete->buffer = malloc(sizeof(t_buffer));
+	paquete->buffer->size = strlen(mensaje) + 1;
+	paquete->buffer->stream = malloc(paquete->buffer->size);
+	memcpy(paquete->buffer->stream, mensaje, paquete->buffer->size);
 
-    int bytes = paquete->buffer->size + 2 * sizeof(int);
+	int bytes = paquete->buffer->size + 2*sizeof(int);
 
-    void *a_enviar = serializar_paquete(paquete, bytes);
+	void* a_enviar = serializar_paquete(paquete, bytes);
 
-    send(socket_cliente, a_enviar, bytes, 0);
+	send(socket_cliente, a_enviar, bytes, 0);
+	// agregado extra (ary) es para saber si el server recibio correctamente el mensaje
+	int32_t result;
+	recv(socket_cliente, &result, sizeof(int32_t), MSG_WAITALL);
+	if (result == 0) {
+		// Handshake OK
+		log_info(logger, "El server recibio el mensaje CORRECTAMENTE");
+	} else {
+		// Handshake ERROR
+		log_info(logger, "El server recibio el mensaje FALLIDO");
+	}
 
-    free(a_enviar);
-    eliminar_paquete(paquete);
+	free(a_enviar);
+	eliminar_paquete(paquete);
 }
 
 void crear_buffer(t_paquete *paquete)
@@ -91,14 +102,25 @@ void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio)
     paquete->buffer->size += tamanio + sizeof(int);
 }
 
-void enviar_paquete(t_paquete *paquete, int socket_cliente)
+void enviar_paquete(t_paquete* paquete, int socket_cliente, t_log* logger)
 {
-    int bytes = paquete->buffer->size + 2 * sizeof(int);
-    void *a_enviar = serializar_paquete(paquete, bytes);
+	int bytes = paquete->buffer->size + 2*sizeof(int);
+	void* a_enviar = serializar_paquete(paquete, bytes);
 
-    send(socket_cliente, a_enviar, bytes, 0);
+	send(socket_cliente, a_enviar, bytes, 0);
 
-    free(a_enviar);
+	// agregado extra (ary) es para saber si el server recibio correctamente el paquete
+	int32_t result;
+	recv(socket_cliente, &result, sizeof(int32_t), MSG_WAITALL);
+	if (result == 0) {
+		// Handshake OK
+		log_info(logger, "El server recibio el paquete CORRECTAMENTE");
+	} else {
+		// Handshake ERROR
+		log_info(logger, "El server recibio el paquete FALLIDO");
+	}
+
+	free(a_enviar);
 }
 
 void eliminar_paquete(t_paquete *paquete)
