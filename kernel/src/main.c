@@ -58,7 +58,21 @@ int main(int argc, char *argv[])
 	// Enviamos al servidor el valor de CLAVE como mensaje
 	enviar_mensaje(valor, conexion_cpu, logger);
 
+	// lee consola, Arma y envia el paquete
+	paquete(conexion_cpu, logger);
 
-    log_destroy(logger);
+	terminar_programa(conexion_cpu, logger, config);
+
     return 0;
 }
+
+void terminar_programa(int conexion, t_log* logger, t_config* config)
+{
+	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
+	  con las funciones de las commons y del TP mencionadas en el enunciado */
+	log_destroy(logger);
+	config_destroy(config);
+	liberar_conexion(conexion);
+}
+
+

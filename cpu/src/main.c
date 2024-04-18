@@ -76,9 +76,14 @@ int main(int argc, char *argv[])
 		case PAQUETE:
 			lista = recibir_paquete(cliente_fd, logger);
 			log_info(logger, "Me llegaron los siguientes valores:\n");
-			list_iterate(lista, (void*) iterator);
-			// si quiero que no gener eerror puedo descomentar la linea que hace cerrar el server antes de esperar el cierre del cli
-			//return EXIT_FAILURE; 
+            // no lo puedo usar por que no me detecta el logger
+			//list_iterate(lista, (void*) iterator);
+
+            for (int i = 0; i < list_size(lista); i++) {
+                char* elemento = list_get(lista, i);
+                log_info(logger, "%s", elemento);
+            }
+
 			break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
@@ -88,10 +93,10 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	return EXIT_SUCCESS;
-    
 
-    return 0;
+    terminar_programa(server_fd, logger, config);    
+
+    return EXIT_SUCCESS;
 }
 
 void iterator(char* value) {
@@ -104,6 +109,6 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
 	log_destroy(logger);
 	config_destroy(config);
-	//liberar_conexion(conexion);
+	liberar_conexion(conexion);
 }
 

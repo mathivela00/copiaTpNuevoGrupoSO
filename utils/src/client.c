@@ -134,3 +134,27 @@ void liberar_conexion(int socket_cliente)
 {
     close(socket_cliente);
 }
+
+void paquete(int conexion, t_log* logger)
+{
+	char* leido;
+    
+	// Inicializo paquete
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+	paquete->codigo_operacion = PAQUETE;
+	crear_buffer(paquete);
+
+	// Leemos y esta vez agregamos las lineas al paquete
+	leido = readline("> ");
+	// Itero hasta que se ingrese un string vacio
+	while(strcmp(leido, "") > 0){
+		agregar_a_paquete(paquete, leido, strlen(leido) +1);
+		leido = readline("> ");
+	}
+	enviar_paquete(paquete, conexion, logger);
+
+	// Libero memoria
+	free(leido);
+	eliminar_paquete(paquete);
+
+}
