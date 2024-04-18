@@ -13,6 +13,6 @@
  */
 void decir_hola(char *quien);
 t_log *iniciar_logger(char *nombre);
-t_config *iniciar_config(char *archivo);
+t_config *iniciar_config(char *archivo, t_log* logger);
 
 #endif

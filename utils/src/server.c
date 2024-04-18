@@ -2,7 +2,7 @@
 
 t_log *logger;
 
-int iniciar_servidor(void)
+int iniciar_servidor(char* puerto, t_log *logger)
 {
     int socket_servidor;
 
@@ -13,7 +13,7 @@ int iniciar_servidor(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+    getaddrinfo(NULL, puerto, &hints, &servinfo);
 
     // Creamos el socket de escucha del servidor
     log_info(logger, "Creando socket de escucha");
@@ -30,7 +30,7 @@ int iniciar_servidor(void)
         log_error(logger, "Error en el bind. Puede ser que haya dos instancias del mismo servidor activas.");
         exit(-1);
     }
-    log_info(logger, "Espero conexiones de un cliente por el puerto %s", PUERTO);
+    log_info(logger, "Espero conexiones de un cliente por el puerto %s", puerto);
 
     // Escuchamos las conexiones entrantes
     log_info(logger, "Escucho las conexiones entrantes");
@@ -42,7 +42,7 @@ int iniciar_servidor(void)
     return socket_servidor;
 }
 
-int esperar_cliente(int socket_servidor)
+int esperar_cliente(int socket_servidor,t_log *logger)
 {
     // Aceptamos un nuevo cliente
     log_info(logger, "Esperando conexion de cliente");
@@ -52,7 +52,7 @@ int esperar_cliente(int socket_servidor)
     return socket_cliente;
 }
 
-int recibir_operacion(int socket_cliente)
+int recibir_operacion(int socket_cliente,t_log *logger)
 {
 	int cod_op;
 	int32_t resultOk = 0;
@@ -83,7 +83,7 @@ void *recibir_buffer(int *size, int socket_cliente)
     return buffer;
 }
 
-void recibir_mensaje(int socket_cliente)
+void recibir_mensaje(int socket_cliente,t_log *logger)
 {
     int size;
     char *buffer = recibir_buffer(&size, socket_cliente);
@@ -91,7 +91,7 @@ void recibir_mensaje(int socket_cliente)
     free(buffer);
 }
 
-t_list* recibir_paquete(int socket_cliente)
+t_list* recibir_paquete(int socket_cliente,t_log *logger)
 {
 	int size;
 	int desplazamiento = 0;
