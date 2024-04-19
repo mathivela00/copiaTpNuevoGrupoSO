@@ -51,13 +51,16 @@ int main(int argc, char *argv[])
     // lee consola hasta string vacio
     //leer_consola(logger);
 
-    /* ---------------- CREAR CONEXION COMO CLIENTE ---------------- 
+    /* ---------------- CREAR CONEXION COMO CLIENTE ---------------- */
     // Creamos una conexión hacia el servidor
-	conexion_cpu = crear_conexion(ip, puerto_cpu);
+	conexion_kernel = crear_conexion(ip, puerto_kernel);
+    if (conexion_kernel == -1){
+        log_error(logger, "ERROR: No se pudo crear la conexion. Esta habilitado el servidor?");
+        return EXIT_FAILURE;
+    }
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
-	enviar_mensaje(valor, conexion_cpu, logger);
-    */  
+	enviar_mensaje(valor, conexion_kernel, logger);  
 
 
     /* ---------------- CREAR CONEXION COMO SERVIDOR ---------------- */

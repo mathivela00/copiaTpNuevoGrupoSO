@@ -28,19 +28,3 @@ t_config *iniciar_config(char *archivo, t_log* logger)
 
     return nuevo_config;
 }
-
-void leer_consola(t_log* logger)
-{
-	char* leido;
-
-	// Leo la primera linea
-	leido = readline("> ");
-	// Itero hasta que se ingrese un string vacio
-	while(strcmp(leido, "") > 0){
-		log_info(logger, leido);
-		leido = readline("> ");
-	}
-
-	// Libero memoria
-	free(leido);
-}

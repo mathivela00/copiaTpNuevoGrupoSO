@@ -19,10 +19,11 @@ int iniciar_servidor(char* puerto, t_log *logger)
     log_info(logger, "Creando socket de escucha");
     socket_servidor = socket(servinfo->ai_family,
                              servinfo->ai_socktype,
-                             servinfo->ai_protocol);
+                             servinfo->ai_protocol);                    
 
     // Asociamos el socket a un puerto
     log_info(logger, "Asociando socket a un puerto...");
+    
     if (bind(socket_servidor,
              servinfo->ai_addr,
              servinfo->ai_addrlen) != 0)
@@ -47,6 +48,10 @@ int esperar_cliente(int socket_servidor,t_log *logger)
     // Aceptamos un nuevo cliente
     log_info(logger, "Esperando conexion de cliente");
     int socket_cliente = accept(socket_servidor, NULL, NULL);
+    if(socket_cliente == -1){
+        log_error(logger,"ERROR: Error al aceptar el cliente.");
+        return -1;
+    }
     log_info(logger, "Se conecto un cliente!");
 
     return socket_cliente;

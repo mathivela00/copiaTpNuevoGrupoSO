@@ -11,8 +11,6 @@
 #include<string.h>
 #include<assert.h>
 
-#define PUERTO "4444"
-
 /* comento ya que lo obtiene desde cliente
 typedef enum
 {

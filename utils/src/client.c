@@ -33,14 +33,12 @@ int crear_conexion(char *ip, char *puerto)
                                 server_info->ai_protocol);
 
     // Ahora que tenemos el socket, vamos a conectarlo
-    /*
     if (connect(socket_cliente,
                 server_info->ai_addr,
                 server_info->ai_addrlen) == -1)
     {
         return -1;
-    }*/
-    connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+    }
 
     freeaddrinfo(server_info);
 
@@ -117,7 +115,7 @@ void enviar_paquete(t_paquete* paquete, int socket_cliente, t_log* logger)
 		log_info(logger, "El server recibio el paquete CORRECTAMENTE");
 	} else {
 		// Handshake ERROR
-		log_info(logger, "El server recibio el paquete FALLIDO");
+		log_error(logger, "El server recibio el paquete FALLIDO");
 	}
 
 	free(a_enviar);
