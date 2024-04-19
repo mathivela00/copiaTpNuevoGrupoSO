@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     char *puerto_kernel;
     char *puerto_cpu;
     char *puerto_memoria;
-    char *puerto_entrada_salida;
+    char *puerto_io;
 
     /* ---------------- INICIALIZACION LOGGER ---------------- */
     t_log *logger;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
     puerto_cpu = config_get_string_value(config, "PUERTO_CPU");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-    puerto_entrada_salida = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
+    puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
 
     // Loggeamos el valor de config
     log_info(logger, "Clave: %s", valor);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     log_info(logger, "Puerto Kernel: %s", puerto_kernel);
     log_info(logger, "Puerto CPU: %s", puerto_cpu);
     log_info(logger, "Puerto Memoria: %s", puerto_memoria);
-    log_info(logger, "Puerto Entrada/Salida: %s", puerto_entrada_salida);
+    log_info(logger, "Puerto Entrada/Salida: %s", puerto_io);
 
     /* ---------------- LEER DE CONSOLA ---------------- */
 

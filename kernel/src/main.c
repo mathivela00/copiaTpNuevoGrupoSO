@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
     puerto_cpu = config_get_string_value(config, "PUERTO_CPU");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-    // puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
+    puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
 
     // Loggeamos el valor de config
     log_info(logger, "Clave: %s", valor);
