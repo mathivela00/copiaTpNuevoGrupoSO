@@ -82,11 +82,17 @@ int main(int argc, char *argv[])
     free(opcion);
     if (opcion_conexion == 1)
     {
-        log_info(logger, "Opciones: cpu/memoria/io");
+        log_info(logger, "Opciones: kernel/cpu/memoria/io");
         while (1)
         {
             opcion = leer_consola();
-            if (!strcmp(opcion, "cpu"))
+            if (!strcmp(opcion, "kernel"))
+            {
+                log_info(logger, "Elegiste KERNEL.");
+                strcpy(opcion_modulo, puerto_kernel);
+                break;
+            }
+            else if (!strcmp(opcion, "cpu"))
             {
                 log_info(logger, "Elegiste CPU.");
                 strcpy(opcion_modulo, puerto_cpu);
@@ -134,6 +140,10 @@ int main(int argc, char *argv[])
     // Creamos una conexión hacia el servidor
     if (opcion_conexion == 1) // si elegimos ENVIAR
     {
+        if(!strcmp(opcion_modulo,puerto_kernel)){
+            log_error(logger,"ERROR: No podes enviar mensajes al mismo modulo!");
+            return EXIT_FAILURE;
+        }
         conexion = crear_conexion(ip, opcion_modulo);
         if (conexion == -1)
         {
