@@ -18,13 +18,13 @@ int main(int argc, char *argv[])
     t_log *logger;
     t_config *config;
 
-    logger = iniciar_logger("cpu");
+    logger = iniciar_logger("memoria");
     if (logger == NULL)
     {
         printf("Error al iniciar el logger\n");
         return 1; // Salir con un código de error
     }
-    log_info(logger, "Hola soy cpu");
+    log_info(logger, "Hola soy memoria");
 
     /* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
     config = iniciar_config("../utils/cliente.config");
