@@ -74,13 +74,13 @@ int main(int argc, char *argv[])
             opcion = leer_consola();
             if (!strcmp(opcion, "kernel"))
             {
-                log_info(logger, "Elegiste KERNEL.");
+                log_info(logger, "Elegiste KERNEL");
                 strcpy(opcion_modulo, puerto_kernel);
                 break;
             }
             else if (!strcmp(opcion, "cpu"))
             {
-                log_info(logger, "Elegiste CPU.");
+                log_info(logger, "Elegiste CPU");
                 strcpy(opcion_modulo, puerto_cpu);
                 break;
             }

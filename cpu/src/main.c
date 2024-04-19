@@ -4,9 +4,9 @@
 int main(int argc, char *argv[])
 {
     /* ---------------- DEFINICION DE VARIABLES ---------------- */
-    int conexion_kernel;
     int conexion_memoria;
-    int conexion_entrada_salida;
+    int opcion_conexion = -1;         // 0 es recibir, 1 es enviar. -1 es default
+    char *opcion_modulo = malloc(4); // el puerto tiene 4 n
 
 	char* ip;
 	char* valor;
@@ -45,59 +45,74 @@ int main(int argc, char *argv[])
     log_info(logger, "Puerto CPU: %s", puerto_cpu);
     log_info(logger, "Puerto Memoria: %s", puerto_memoria);
     log_info(logger, "Puerto Entrada/Salida: %s", puerto_entrada_salida);
-    
 
     /* ---------------- LEER DE CONSOLA ---------------- */
-    // lee consola hasta string vacio
-    //leer_consola(logger);
 
-    /* ---------------- CREAR CONEXION COMO CLIENTE ---------------- */
-    // Creamos una conexión hacia el servidor
-	conexion_kernel = crear_conexion(ip, puerto_kernel);
-    if (conexion_kernel == -1){
-        log_error(logger, "ERROR: No se pudo crear la conexion. Esta habilitado el servidor?");
-        return EXIT_FAILURE;
+    log_info(logger, "Quiere enviar a MEMORIA o recibir del KERNEL?");
+    while (opcion_conexion == -1)
+    {
+        opcion_conexion = enviar_o_recibir();
+        if (opcion_conexion == -1){
+            log_error(logger, "ERROR: Opcion invalida. Escriba 'enviar' o 'recibir'");
+        }
     }
 
-	// Enviamos al servidor el valor de CLAVE como mensaje
-	enviar_mensaje(valor, conexion_kernel, logger);  
+    if (opcion_conexion == 1)
+    {
+        log_info(logger, "Elegiste enviar a MEMORIA");
+        strcpy(opcion_modulo, puerto_memoria);
 
+        /* ---------------- CREAR CONEXION COMO CLIENTE CON EL MODULO DE MEMORIA ---------------- */
+        // Creamos una conexión hacia el modulo de memoria
+	    conexion_memoria = crear_conexion(ip, puerto_memoria);
+        if (conexion_memoria == -1){
+            log_error(logger, "ERROR: No se pudo crear la conexion. Esta habilitado el módulo de Memoria?");
+            return EXIT_FAILURE;
+        }
 
-    /* ---------------- CREAR CONEXION COMO SERVIDOR ---------------- */
-	int server_fd = iniciar_servidor(puerto_cpu, logger);
-	log_info(logger, "Servidor listo para recibir al cliente");
-    
-	int cliente_fd = esperar_cliente(server_fd, logger);
-    
-	t_list* lista;
-	while (1) {
-		int cod_op = recibir_operacion(cliente_fd, logger);
-		switch (cod_op) {
-		case MENSAJE:
-			recibir_mensaje(cliente_fd, logger);
-			break;
-		case PAQUETE:
-			lista = recibir_paquete(cliente_fd, logger);
-			log_info(logger, "Me llegaron los siguientes valores:\n");
-            // no lo puedo usar por que no me detecta el logger
-			//list_iterate(lista, (void*) iterator);
+        // Enviamos al modulo de memoria el valor de CLAVE como mensaje
+	    enviar_mensaje(valor, conexion_memoria, logger);
+    }
+    else
+    {
+        log_info(logger, "Elegiste recibir del KERNEL");
 
-            for (int i = 0; i < list_size(lista); i++) {
-                char* elemento = list_get(lista, i);
-                log_info(logger, "%s", elemento);
+            /* ---------------- CREAR CONEXION COMO SERVIDOR CON EL MODULO DE KERNEL ---------------- */
+        int server_fd = iniciar_servidor(puerto_cpu, logger);
+        log_info(logger, "Servidor listo para recibir al cliente");
+        
+        int cliente_fd = esperar_cliente(server_fd, logger);
+        
+        t_list* lista;
+        while (1) {
+            int cod_op = recibir_operacion(cliente_fd, logger);
+            switch (cod_op) {
+            case MENSAJE:
+                recibir_mensaje(cliente_fd, logger);
+                break;
+            case PAQUETE:
+                lista = recibir_paquete(cliente_fd, logger);
+                log_info(logger, "Me llegaron los siguientes valores:\n");
+                // no lo puedo usar por que no me detecta el logger
+                //list_iterate(lista, (void*) iterator);
+
+                for (int i = 0; i < list_size(lista); i++) {
+                    char* elemento = list_get(lista, i);
+                    log_info(logger, "%s", elemento);
+                }
+
+                break;
+            case -1:
+                log_error(logger, "el cliente se desconecto. Terminando servidor");
+                return EXIT_FAILURE;
+            default:
+                log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+                break;
             }
+        }
 
-			break;
-		case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-			return EXIT_FAILURE;
-		default:
-			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
-		}
-	}
-
-    terminar_programa(server_fd, logger, config);    
+        terminar_programa(server_fd, logger, config);
+    }      
 
     return EXIT_SUCCESS;
 }
