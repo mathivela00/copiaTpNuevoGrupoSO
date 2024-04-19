@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
     int conexion;
 
     int opcion_conexion = -1;         // 0 es recibir, 1 es enviar. -1 es default
-    char *opcion_modulo = malloc(4); // el puerto tiene 4 n
 
     char *ip;
     char *valor;
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
     puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
     puerto_cpu = config_get_string_value(config, "PUERTO_CPU");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-    puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
+    // puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
 
     // Loggeamos el valor de config
     log_info(logger, "Clave: %s", valor);
@@ -55,7 +54,7 @@ int main(int argc, char *argv[])
 
     /* ---------------- LEER DE CONSOLA ---------------- */
     // lee consola hasta string vacio
-    log_info(logger, "Quiere enviar o recibir?");
+    log_info(logger, "Quiere enviar a CPU/MEMORIA o recibir de INTERFAZ DE I/O?");
     while (opcion_conexion == -1)
     {
         opcion_conexion = enviar_o_recibir();
@@ -64,49 +63,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (opcion_conexion == 1)
-    {
-        char *opcion;
-        log_info(logger, "Elegiste ENVIAR. A cual modulo?");
-        log_info(logger, "Opciones: kernel/cpu/memoria/io");
-        while (1)
-        {
-            opcion = leer_consola();
-            if (!strcmp(opcion, "kernel"))
-            {
-                log_info(logger, "Elegiste KERNEL");
-                strcpy(opcion_modulo, puerto_kernel);
-                break;
-            }
-            else if (!strcmp(opcion, "cpu"))
-            {
-                log_info(logger, "Elegiste CPU");
-                strcpy(opcion_modulo, puerto_cpu);
-                break;
-            }
-            else if (!strcmp(opcion, "memoria"))
-            {
-                log_info(logger, "Elegiste MEMORIA");
-                strcpy(opcion_modulo, puerto_memoria);
-                break;
-            }
-            else if (!strcmp(opcion, "io"))
-            {
-                log_info(logger, "Elegiste ENTRADA/SALIDA");
-                strcpy(opcion_modulo, puerto_io);
-                break;
-            }
-            else
-            {
-                log_error(logger, "ERROR: Opcion invalida. Opciones: cpu/memoria/io");
-            }
-        }
-        free(opcion);
-    }
-
     /* ---------------- CREAR CONEXION COMO SERVIDOR ---------------- */
     if (opcion_conexion == 0) // Si elegimos RECIBIR
     {
+        log_info(logger, "Elegiste recibir de INTERFAZ DE I/O.");
         int server_fd = iniciar_servidor(puerto_kernel, logger);
         log_info(logger, "Servidor listo para recibir al cliente");
 
@@ -120,18 +80,39 @@ int main(int argc, char *argv[])
                 break;
             }
         }
+        terminar_programa(server_fd, logger, config);
+        return EXIT_SUCCESS;
     }
 
     /* ---------------- CREAR CONEXION COMO CLIENTE ---------------- */
     // Creamos una conexión hacia el servidor
     if (opcion_conexion == 1) // si elegimos ENVIAR
     {
-        if (!strcmp(opcion_modulo, puerto_kernel))
+        char *opcion;
+        log_info(logger, "Elegiste ENVIAR. A cual modulo?");
+        log_info(logger, "Opciones: cpu/memoria");
+        while (1)
         {
-            log_error(logger, "ERROR: No podes enviar mensajes al mismo modulo!");
-            return EXIT_FAILURE;
+            opcion = leer_consola();
+            if (!strcmp(opcion, "cpu"))
+            {
+                log_info(logger, "Elegiste enviar a CPU");
+                conexion = crear_conexion(ip, puerto_cpu);
+                break;
+            }
+            else if (!strcmp(opcion, "memoria"))
+            {
+                log_info(logger, "Elegiste enviar a MEMORIA");
+                conexion = crear_conexion(ip, puerto_memoria);
+                break;
+            }
+            else
+            {
+                log_error(logger, "ERROR: Opcion invalida. Opciones: cpu/memoria/io");
+            }
         }
-        conexion = crear_conexion(ip, opcion_modulo);
+        free(opcion);
+
         if (conexion == -1)
         {
             log_error(logger, "ERROR: No se pudo crear la conexion. Esta habilitado el servidor?");
@@ -140,12 +121,13 @@ int main(int argc, char *argv[])
 
         // Enviamos al servidor el valor de CLAVE como mensaje
         enviar_mensaje(valor, conexion, logger);
+        
+        terminar_programa(conexion, logger, config);
+        return EXIT_SUCCESS;
     }
 
     // lee consola, Arma y envia el paquet
     // paquete(conexion, logger);
-
-    terminar_programa(conexion, logger, config);
 
     return 0;
 }
