@@ -117,3 +117,34 @@ t_list* recibir_paquete(int socket_cliente,t_log *logger)
 	free(buffer);
 	return valores;
 }
+
+int conexion_servidor(int cliente, t_log *logger)
+{
+    t_list *lista;
+    int cod_op = recibir_operacion(cliente, logger);
+    switch (cod_op)
+    {
+    case MENSAJE:
+        recibir_mensaje(cliente, logger);
+        return 2;
+    case PAQUETE:
+        lista = recibir_paquete(cliente, logger);
+        log_info(logger, "Me llegaron los siguientes valores:\n");
+        // no lo puedo usar por que no me detecta el logger
+        // list_iterate(lista, (void*) iterator);
+
+        for (int i = 0; i < list_size(lista); i++)
+        {
+            char *elemento = list_get(lista, i);
+            log_info(logger, "%s", elemento);
+        }
+
+        return 1;
+    case -1:
+        log_error(logger, "el cliente se desconecto. Terminando servidor");
+        return -1;
+    default:
+        log_warning(logger, "Operacion desconocida. No quieras meter la pata");
+        return 0;
+    }
+}

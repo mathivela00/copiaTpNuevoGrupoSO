@@ -10,6 +10,7 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<assert.h>
+#include "client.h"
 
 /* comento ya que lo obtiene desde cliente
 typedef enum
@@ -28,5 +29,6 @@ int esperar_cliente(int,t_log* logger);
 t_list* recibir_paquete(int,t_log* logger);
 void recibir_mensaje(int,t_log* logger);
 int recibir_operacion(int,t_log* logger);
+int conexion_servidor(int cliente, t_log *logger);
 
 #endif /* UTILS_H_ */

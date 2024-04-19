@@ -19,9 +19,9 @@ t_log *iniciar_logger(char *nombre)
     return nuevo_logger;
 }
 
-t_config *iniciar_config(char *archivo, t_log* logger)
+t_config *iniciar_config(char *archivo)
 {
-    t_config* nuevo_config;
+    t_config *nuevo_config;
 
     // Crear la nueva configuración.
     nuevo_config = config_create(archivo);

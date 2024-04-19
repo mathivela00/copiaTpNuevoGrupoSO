@@ -9,17 +9,18 @@ char *leer_consola();
 int main(int argc, char *argv[])
 {
     /* ---------------- DEFINICION DE VARIABLES ---------------- */
-    int conexion;
     
+    int conexion;
+
     int opcion_conexion; // 0 es recibir, 1 es enviar.
-    int opcion_modulo;
+    char *opcion_modulo = malloc(4); // el puerto tiene 4 n
 
     char *ip;
     char *valor;
     char *puerto_kernel;
     char *puerto_cpu;
     char *puerto_memoria;
-    char *puerto_entrada_salida;
+    char *puerto_io;
 
     /* ---------------- INICIALIZACION LOGGER ---------------- */
     t_log *logger;
@@ -34,7 +35,9 @@ int main(int argc, char *argv[])
     log_info(logger, "Hola soy kernel");
 
     /* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-    config = iniciar_config("../utils/cliente.config", logger);
+    
+    config = iniciar_config("../utils/cliente.config");
+    // config_init(config,logger);
 
     // Obtengo las variables
     ip = config_get_string_value(config, "IP");
@@ -42,7 +45,7 @@ int main(int argc, char *argv[])
     puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
     puerto_cpu = config_get_string_value(config, "PUERTO_CPU");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-    puerto_entrada_salida = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
+    puerto_io = config_get_string_value(config, "PUERTO_ENTRADA_SALIDA");
 
     // Loggeamos el valor de config
     log_info(logger, "Clave: %s", valor);
@@ -50,7 +53,7 @@ int main(int argc, char *argv[])
     log_info(logger, "Puerto Kernel: %s", puerto_kernel);
     log_info(logger, "Puerto CPU: %s", puerto_cpu);
     log_info(logger, "Puerto Memoria: %s", puerto_memoria);
-    log_info(logger, "Puerto Entrada/Salida: %s", puerto_entrada_salida);
+    log_info(logger, "Puerto Entrada/Salida: %s", puerto_io);
 
     /* ---------------- LEER DE CONSOLA ---------------- */
     // lee consola hasta string vacio
@@ -74,37 +77,38 @@ int main(int argc, char *argv[])
         }
         else
         {
-            log_error(logger, "Ehh???");
+            log_error(logger, "ERROR: Opcion invalida. Escriba 'enviar' o 'recibir'");
         }
     }
-    log_info(logger, "Opciones: cpu/memoria/io");
+
     free(opcion);
     if (opcion_conexion == 1)
     {
+        log_info(logger, "Opciones: cpu/memoria/io");
         while (1)
         {
             opcion = leer_consola();
             if (!strcmp(opcion, "cpu"))
             {
                 log_info(logger, "Elegiste CPU.");
-                opcion_modulo = puerto_cpu;
+                strcpy(opcion_modulo, puerto_cpu);
                 break;
             }
             else if (!strcmp(opcion, "memoria"))
             {
                 log_info(logger, "Elegiste MEMORIA");
-                opcion_modulo = puerto_memoria;
+                strcpy(opcion_modulo, puerto_memoria);
                 break;
             }
             else if (!strcmp(opcion, "io"))
             {
                 log_info(logger, "Elegiste ENTRADA/SALIDA");
-                opcion_modulo = puerto_entrada_salida;
+                strcpy(opcion_modulo, puerto_io);
                 break;
             }
             else
             {
-                log_error(logger, "Ehh???");
+                log_error(logger, "ERROR: Opcion invalida. Opciones: cpu/memoria/io");
             }
         }
         free(opcion);
@@ -142,7 +146,7 @@ int main(int argc, char *argv[])
         }
 
         // Enviamos al servidor el valor de CLAVE como mensaje
-        enviar_mensaje(valor, opcion_modulo, logger);
+        enviar_mensaje(valor, conexion, logger);
     }
 
     // lee consola, Arma y envia el paquet
@@ -153,35 +157,14 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int conexion_servidor(int cliente, t_log *logger)
+char *leer_consola()
 {
-    t_list *lista;
-    int cod_op = recibir_operacion(cliente, logger);
-    switch (cod_op)
-    {
-    case MENSAJE:
-        recibir_mensaje(cliente, logger);
-        return 2;
-    case PAQUETE:
-        lista = recibir_paquete(cliente, logger);
-        log_info(logger, "Me llegaron los siguientes valores:\n");
-        // no lo puedo usar por que no me detecta el logger
-        // list_iterate(lista, (void*) iterator);
-
-        for (int i = 0; i < list_size(lista); i++)
-        {
-            char *elemento = list_get(lista, i);
-            log_info(logger, "%s", elemento);
-        }
-
-        return 1;
-    case -1:
-        log_error(logger, "el cliente se desconecto. Terminando servidor");
-        return -1;
-    default:
-        log_warning(logger, "Operacion desconocida. No quieras meter la pata");
-        return 0;
-    }
+    char *leido;
+    leido = readline("Kernel> ");
+    char *opcion = malloc(strlen(leido) + 1);
+    strcpy(opcion, leido);
+    free(leido);
+    return opcion;
 }
 
 void terminar_programa(int conexion, t_log *logger, t_config *config)
@@ -191,14 +174,4 @@ void terminar_programa(int conexion, t_log *logger, t_config *config)
     log_destroy(logger);
     config_destroy(config);
     liberar_conexion(conexion);
-}
-
-char *leer_consola()
-{
-    char *leido;
-    leido = readline("> ");
-    char *opcion = malloc(strlen(leido) + 1);
-    strcpy(opcion, leido);
-    free(leido);
-    return opcion;
 }
