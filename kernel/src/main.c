@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     int conexion;
 
-    int opcion_conexion;             // 0 es recibir, 1 es enviar.
+    int opcion_conexion = -1;         // 0 es recibir, 1 es enviar. -1 es default
     char *opcion_modulo = malloc(4); // el puerto tiene 4 n
 
     char *ip;
@@ -55,33 +55,19 @@ int main(int argc, char *argv[])
 
     /* ---------------- LEER DE CONSOLA ---------------- */
     // lee consola hasta string vacio
-    char *opcion;
-
     log_info(logger, "Quiere enviar o recibir?");
-    while (1)
+    while (opcion_conexion == -1)
     {
-        opcion = leer_consola();
-        if (!strcmp(opcion, "enviar"))
-        {
-            opcion_conexion = 1;
-            log_info(logger, "Elegiste ENVIAR. A cual modulo?");
-            break;
-        }
-        else if (!strcmp(opcion, "recibir"))
-        {
-            opcion_conexion = 0;
-            log_info(logger, "Elegiste RECIBIR.");
-            break;
-        }
-        else
-        {
+        opcion_conexion = enviar_o_recibir();
+        if (opcion_conexion == -1){
             log_error(logger, "ERROR: Opcion invalida. Escriba 'enviar' o 'recibir'");
         }
     }
 
-    free(opcion);
     if (opcion_conexion == 1)
     {
+        char *opcion;
+        log_info(logger, "Elegiste ENVIAR. A cual modulo?");
         log_info(logger, "Opciones: kernel/cpu/memoria/io");
         while (1)
         {
@@ -140,8 +126,9 @@ int main(int argc, char *argv[])
     // Creamos una conexión hacia el servidor
     if (opcion_conexion == 1) // si elegimos ENVIAR
     {
-        if(!strcmp(opcion_modulo,puerto_kernel)){
-            log_error(logger,"ERROR: No podes enviar mensajes al mismo modulo!");
+        if (!strcmp(opcion_modulo, puerto_kernel))
+        {
+            log_error(logger, "ERROR: No podes enviar mensajes al mismo modulo!");
             return EXIT_FAILURE;
         }
         conexion = crear_conexion(ip, opcion_modulo);

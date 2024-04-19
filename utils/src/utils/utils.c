@@ -47,3 +47,31 @@ void terminar_programa(int conexion, t_log *logger, t_config *config)
     config_destroy(config);
     liberar_conexion(conexion);
 }
+
+int enviar_o_recibir()
+{
+    char *opcion;
+    opcion = leer_consola();
+    if (!strcmp(opcion, "enviar"))
+    {
+        // opcion_conexion = 1;
+        // log_info(logger, "Elegiste ENVIAR. A cual modulo?");
+        // break;
+        free(opcion);
+        return 1;
+    }
+    else if (!strcmp(opcion, "recibir"))
+    {
+        // opcion_conexion = 0;
+        // log_info(logger, "Elegiste RECIBIR.");
+        // break;
+        free(opcion);
+        return 0;
+    }
+    else
+    {
+        // log_error(logger, "ERROR: Opcion invalida. Escriba 'enviar' o 'recibir'");
+        free(opcion);
+        return -1;
+    }
+}

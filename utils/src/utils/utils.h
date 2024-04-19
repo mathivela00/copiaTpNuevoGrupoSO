@@ -16,5 +16,6 @@ t_log *iniciar_logger(char *nombre);
 t_config *iniciar_config(char *archivo);
 char *leer_consola();
 void terminar_programa(int conexion, t_log *logger, t_config *config);
+int enviar_o_recibir();
 
 #endif
