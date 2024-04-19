@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
 
     /* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-    config = iniciar_config("../utils/cliente.config", logger);
+    config = iniciar_config("../utils/cliente.config");
 
     // Obtengo las variables
     ip = config_get_string_value(config, "IP");
