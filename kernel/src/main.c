@@ -4,15 +4,13 @@
 #include <client.h>
 #include <server.h>
 
-char *leer_consola();
-
 int main(int argc, char *argv[])
 {
     /* ---------------- DEFINICION DE VARIABLES ---------------- */
-    
+
     int conexion;
 
-    int opcion_conexion; // 0 es recibir, 1 es enviar.
+    int opcion_conexion;             // 0 es recibir, 1 es enviar.
     char *opcion_modulo = malloc(4); // el puerto tiene 4 n
 
     char *ip;
@@ -35,7 +33,7 @@ int main(int argc, char *argv[])
     log_info(logger, "Hola soy kernel");
 
     /* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-    
+
     config = iniciar_config("../utils/cliente.config");
     // config_init(config,logger);
 
@@ -114,8 +112,6 @@ int main(int argc, char *argv[])
         free(opcion);
     }
 
-    // opcion = leer_consola();
-
     /* ---------------- CREAR CONEXION COMO SERVIDOR ---------------- */
     if (opcion_conexion == 0) // Si elegimos RECIBIR
     {
@@ -155,23 +151,4 @@ int main(int argc, char *argv[])
     terminar_programa(conexion, logger, config);
 
     return 0;
-}
-
-char *leer_consola()
-{
-    char *leido;
-    leido = readline("Kernel> ");
-    char *opcion = malloc(strlen(leido) + 1);
-    strcpy(opcion, leido);
-    free(leido);
-    return opcion;
-}
-
-void terminar_programa(int conexion, t_log *logger, t_config *config)
-{
-    /* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config)
-      con las funciones de las commons y del TP mencionadas en el enunciado */
-    log_destroy(logger);
-    config_destroy(config);
-    liberar_conexion(conexion);
 }
