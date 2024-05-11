@@ -22,10 +22,4 @@ void iniciar_configs(void);
 void imprimir_configs(void);
 
 
-
-
-
-
-
-
 #endif /*  INICIO_MEMORIA_H_*/
