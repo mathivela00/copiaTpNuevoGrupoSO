@@ -20,7 +20,6 @@
 #include "CPU-Kernel-Interrupt.h"
 #include "CPU-Memoria.h"
 
-
 char* PUERTO_ESCUCHA_DISPATCH;
 char* PUERTO_ESCUCHA_INTERRUPT;
 char* IP_MEMORIA;
@@ -38,7 +37,6 @@ int fd_CPU_interrupt;
 int fd_kernel_dispatch;
 int fd_kernel_interrupt;
 int fd_entradaSalida;
-
 
 
 #endif /* CPU_H */
