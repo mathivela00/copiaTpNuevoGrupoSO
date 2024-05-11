@@ -39,7 +39,7 @@ es decir usar el mmu para buscar en ram
 COP: cod operacion
 [ COP | DATO o DATA ] = IR
 8 bits    24 bits
-*/ */
+*/ 
 
 // * * * M O D U L O   A L U * * * //
 
@@ -84,4 +84,37 @@ se pasa al MDR (contenido del puntero)
         break;
     }
 
+}
+
+// Asigna al registro el valor pasado como parámetro.
+void set(registro, valor){
+    registro = valor;
+}
+
+// Suma al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.
+void sum(destino, origen){
+    destino += origen;
+}
+
+// Resta al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.
+void sub(destino, origen){
+    destino -= origen;
+}
+
+// Si el valor del registro es distinto de cero, actualiza el program counter al número de 
+// instrucción pasada por parámetro.
+void jnz(registro, instruccion){
+    if (registro == 0){
+        PC = instruccion;
+    }
+}
+
+// Esta instrucción solicita al Kernel que se envíe a una interfaz de I/O a que 
+// realice un sleep por una cantidad de unidades de trabajo.
+void io_gen_sleep(interfaz, unidad_trabajo){
+    sleep: [
+        interfaz = interfaz;
+        tiempo = unidad_trabajo; 
+    ]
+    enviar_paquete(kernel, sleep)
 }
