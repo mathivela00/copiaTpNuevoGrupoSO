@@ -1,2 +1,0 @@
-#include "EntradaSalida-Memoria.h"
-
