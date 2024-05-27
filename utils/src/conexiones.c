@@ -97,29 +97,18 @@ int esperar_cliente(int socket_servidor, t_log* logger)
     return socket_cliente;
 }
 
-
 /*----------Fin Servidor----------*/
 
 
 /*----------Mensajeria----------*/
 
- void enviar_mensaje(char* mensaje, int socket_cliente)
+ void enviar_mensaje(char* mensaje, int socket)
  {
- 	t_paquete* paquete = malloc(sizeof(t_paquete));
+ 	t_paquete* paquete = crear_paquete(MENSAJE);
+    uint32_t tamanio = string_length(mensaje)+1;
+    agregar_a_paquete_string(paquete, tamanio, mensaje);
 
- 	paquete->codigo_operacion = MENSAJE;
- 	paquete->buffer = malloc(sizeof(t_buffer));
- 	paquete->buffer->size = strlen(mensaje) + 1;
- 	paquete->buffer->stream = malloc(paquete->buffer->size);
- 	memcpy(paquete->buffer->stream, mensaje, paquete->buffer->size);
-
- 	int bytes = paquete->buffer->size + 2*sizeof(int);
-
- 	void* a_enviar = serializar_paquete(paquete, bytes);
-
- 	send(socket_cliente, a_enviar, bytes, 0);
-
- 	free(a_enviar);
+    enviar_paquete(paquete, socket);	
 	eliminar_paquete(paquete);
  }
 
@@ -137,17 +126,6 @@ void crear_buffer(t_paquete* paquete)
 	paquete->buffer->size = 0;
 	paquete->buffer->stream = NULL;
 }
-
-
-// void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio)//Puede que no haga falta, REVISAR
-// {
-// 	paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + tamanio + sizeof(int));
-
-// 	memcpy(paquete->buffer->stream + paquete->buffer->size, &tamanio, sizeof(int));
-// 	memcpy(paquete->buffer->stream + paquete->buffer->size + sizeof(int), valor, tamanio);
-
-// 	paquete->buffer->size += tamanio + sizeof(int);
-// }
 
 void enviar_paquete(t_paquete* paquete, int socket_cliente)
 {
@@ -192,34 +170,17 @@ op_code recibir_operacion(int socket_cliente){
 	}
 }
 
-t_list* recibir_paquete(int socket_cliente)
-{
-    uint32_t size;
-    int desplazamiento = 0;
-    void * buffer;
-    t_list* valores = list_create();
-    int tamanio;
-
-    buffer = recibir_buffer(&size, socket_cliente);
-    while(desplazamiento < size)
-    {
-        memcpy(&tamanio, buffer + desplazamiento, sizeof(int));
-        desplazamiento+=sizeof(int);
-        char* valor = malloc(tamanio);
-        memcpy(valor, buffer+desplazamiento, tamanio);
-        desplazamiento+=tamanio;
-        list_add(valores, valor);
-    }
-    free(buffer);
-    return valores;
-}
-
 void recibir_mensaje(int socket_cliente, t_log* logger)
 {
     uint32_t size;
-    char* buffer = recibir_buffer(&size, socket_cliente);
-    log_info(logger, "Me llego el mensaje %s", buffer);
+    int desplazamiento = 0;
+    void* buffer = recibir_buffer(&size, socket_cliente);
+
+    char* mensaje = leer_de_buffer_string(buffer, &desplazamiento);
+
+    log_info(logger, "Me llego el mensaje %s", mensaje);
     free(buffer);
+    free(mensaje);
 }
 
 void* recibir_buffer(uint32_t* size, int socket_cliente)
@@ -317,14 +278,14 @@ void serializar_CE(t_paquete* paquete, t_contexto_ejecucion contexto)
 
 void enviar_CE(int socket, uint32_t PID, t_contexto_ejecucion contexto)
 {
-    t_paquete* paquete = crear_paquete(CE);
+    t_paquete* paquete = crear_paquete(CONTEXTO);
     agregar_a_paquete_uint32(paquete, PID);
     serializar_CE(paquete, contexto);
     enviar_paquete(paquete, socket);
     eliminar_paquete(paquete);
 };
 
-void recibir_CE(int socket, uint32_t PID_contenedor, t_contexto_ejecucion contexto_contenedor)
+void recibir_CE(int socket, uint32_t* PID_contenedor, t_contexto_ejecucion* contexto_contenedor)
 {
     uint32_t size = 0;
     int desplazamiento = 0;
@@ -332,14 +293,18 @@ void recibir_CE(int socket, uint32_t PID_contenedor, t_contexto_ejecucion contex
 
     buffer = recibir_buffer(&size, socket);
 
-    PID_contenedor = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.PC = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.EAX = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.EBX = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.ECX = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.EDX = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.SI = leer_de_buffer_uint32(buffer, &desplazamiento);
-    contexto_contenedor.DI = leer_de_buffer_uint32(buffer, &desplazamiento);
+    (*PID_contenedor) = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->PC = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->AX = leer_de_buffer_uint8(buffer, &desplazamiento);
+    contexto_contenedor->BX = leer_de_buffer_uint8(buffer, &desplazamiento);
+    contexto_contenedor->CX = leer_de_buffer_uint8(buffer, &desplazamiento);
+    contexto_contenedor->DX = leer_de_buffer_uint8(buffer, &desplazamiento);
+    contexto_contenedor->EAX = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->EBX = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->ECX = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->EDX = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->SI = leer_de_buffer_uint32(buffer, &desplazamiento);
+    contexto_contenedor->DI = leer_de_buffer_uint32(buffer, &desplazamiento);
 
     free(buffer);
 };

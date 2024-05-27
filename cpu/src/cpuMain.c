@@ -49,22 +49,42 @@ int main(int argc, char* argv[]) {
     enviar_mensaje("CPU manda mensaje a Memoria", socket_cpu_memoria);
     log_info(logger, "Se envio el primer mensaje a memoria");
 
-    //Pruebas con kernel
-    //iniciar Server de CPU
-    socket_escucha = iniciar_servidor(puerto_escucha_dispatch, logger);
+    uint32_t PID = 0;
+    t_contexto_ejecucion CE;
+    CE.PC = 0;
+    CE.AX = 0;
+    CE.BX = 0;
+    CE.CX = 0;
+    CE.DX = 0;
+    CE.EAX = 0;
+    CE.EBX = 0;
+    CE.ECX = 0;
+    CE.EDX = 0;
+    CE.SI = 0;
+    CE.DI = 0;
+    log_info(logger, "CE contenedor listo, datos: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, CE.PC, CE.AX, CE.EAX, CE.SI);
 
-    //esperar conexion de kernel
-    socket_cpu_kernel_dispatch = esperar_cliente(socket_escucha, logger);
-    //enviar mensaje a kernel
-    enviar_mensaje("CPU manda mensaje a Kernel", socket_cpu_kernel_dispatch);
-    log_info(logger, "Se envio el primer mensaje a kernel");
+    op_code codopCE = recibir_operacion(socket_cpu_memoria);    
+    if (codopCE == CONTEXTO) {log_info(logger, "LLego un contexto de ejecucion");}
+    recibir_CE(socket_cpu_memoria, &PID, &CE);
+    log_info(logger, "datos nuevos CE contenedor: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, CE.PC, CE.AX, CE.EAX, CE.SI);
 
-    //recibir respuesta de kernel
-    op_code codop2 = recibir_operacion(socket_cpu_kernel_dispatch);
+    // //Pruebas con kernel
+    // //iniciar Server de CPU
+    // socket_escucha = iniciar_servidor(puerto_escucha_dispatch, logger);
+
+    // //esperar conexion de kernel
+    // socket_cpu_kernel_dispatch = esperar_cliente(socket_escucha, logger);
+    // //enviar mensaje a kernel
+    // enviar_mensaje("CPU manda mensaje a Kernel", socket_cpu_kernel_dispatch);
+    // log_info(logger, "Se envio el primer mensaje a kernel");
+
+    // //recibir respuesta de kernel
+    // op_code codop2 = recibir_operacion(socket_cpu_kernel_dispatch);
     
-    if (codop2 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    else {log_info(logger, "LLego otra cosa");}
-    recibir_mensaje(socket_cpu_kernel_dispatch, logger);
+    // if (codop2 == MENSAJE) {log_info(logger, "LLego un mensaje");}
+    // else {log_info(logger, "LLego otra cosa");}
+    // recibir_mensaje(socket_cpu_kernel_dispatch, logger);
 
     if (socket_cpu_kernel_dispatch) {liberar_conexion(socket_cpu_kernel_dispatch);}
     if (socket_cpu_kernel_interrupt) {liberar_conexion(socket_cpu_kernel_interrupt);}
