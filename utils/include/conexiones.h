@@ -11,7 +11,6 @@
 #include <errno.h>
 #include <readline/readline.h>
 #include <commons/log.h>
-#include <commons/collections/list.h>
 #include "utils.h"
 
 /*----------Estructuras----------*/
@@ -20,7 +19,7 @@ typedef enum CODIGOS_DE_OPERACIONES
 {
     MENSAJE,
     PAQUETE,
-    CE
+    CONTEXTO,
 } op_code;
 
 typedef struct
@@ -55,10 +54,9 @@ int esperar_cliente(int socket, t_log* logger);
 void enviar_mensaje(char* mensaje, int socket);
 t_paquete* crear_paquete(op_code codigo);
 void crear_buffer(t_paquete* paquete);
-void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);
 void enviar_paquete(t_paquete* paquete, int socket);
-void eliminar_paquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
+void eliminar_paquete(t_paquete* paquete);
 
 op_code recibir_operacion(int socket);
 t_list* recibir_paquete(int socket);
@@ -66,7 +64,7 @@ void recibir_mensaje(int socket, t_log* logger);
 void* recibir_buffer(uint32_t* size, int socket);
 
 void enviar_CE(int socket, uint32_t PID, t_contexto_ejecucion contexto);
-void recibir_CE(int socket, uint32_t PID, t_contexto_ejecucion contexto_contenedor);
+void recibir_CE(int socket, uint32_t* PID, t_contexto_ejecucion* contexto_contenedor);
 /*----------Fin Mensajeria----------*/
 
 

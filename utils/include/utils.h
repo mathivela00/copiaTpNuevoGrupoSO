@@ -7,7 +7,10 @@
 #include<commons/log.h>
 #include<commons/string.h>
 #include<commons/config.h>
+#include <commons/collections/list.h>
 #include<readline/readline.h>
+#include <semaphore.h>
+#include <pthread.h>
 
 typedef enum 
 {
@@ -22,16 +25,16 @@ typedef struct contexto_de_ejecucion_de_proceso
 {
     uint32_t PC;
     uint8_t AX;
-	uint8_t BX;
-	uint8_t CX;
-	uint8_t DX;
+    uint8_t BX;
+    uint8_t CX;
+    uint8_t DX;
     uint32_t EAX;
     uint32_t EBX;
     uint32_t ECX;
     uint32_t EDX;
     uint32_t SI;
     uint32_t DI;
-} t_contexto_ejecucion; 
+} t_contexto_ejecucion;
 
 typedef struct pcb_de_proceso
 {
