@@ -20,7 +20,16 @@ typedef enum CODIGOS_DE_OPERACIONES
     MENSAJE,
     PAQUETE,
     CONTEXTO,
+    FETCH
+
 } op_code;
+
+typedef enum CODIGOS_DE_INTERRUPCIONES
+{
+    INT_NO,
+    INT_QUANTUM,
+    INT_CONSOLA
+} int_code;
 
 typedef struct
 {
@@ -72,10 +81,12 @@ void recibir_CE(int socket, uint32_t* PID, t_contexto_ejecucion* contexto_conten
 void agregar_a_paquete_uint8(t_paquete* paquete, uint8_t numero);
 void agregar_a_paquete_uint32(t_paquete* paquete, uint32_t numero);
 void agregar_a_paquete_string(t_paquete* paquete, uint32_t tamanio, char* string);
+void agregar_a_paquete_cod_ins(t_paquete* paquete, cod_ins codigo);
 
 uint8_t leer_de_buffer_uint8(void* buffer, int* desplazamiento);
 uint32_t leer_de_buffer_uint32(void* buffer, int* desplazamiento);
 char* leer_de_buffer_string(void* buffer, int* desplazamiento);
+cod_ins leer_de_buffer_cod_ins(void* buffer, int* desplazamiento);
 
 void serializar_CE(t_paquete* paquete, t_contexto_ejecucion contexto);
 

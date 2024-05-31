@@ -308,4 +308,24 @@ void recibir_CE(int socket, uint32_t* PID_contenedor, t_contexto_ejecucion* cont
 
     free(buffer);
 };
+
+void agregar_a_paquete_cod_ins(t_paquete* paquete, cod_ins codigo){    
+    paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + sizeof(cod_ins));
+
+	memcpy(paquete->buffer->stream + paquete->buffer->size, &codigo, sizeof(cod_ins));
+
+	paquete->buffer->size += sizeof(cod_ins);    
+}
+
+cod_ins leer_de_buffer_cod_ins(void* buffer, int* desplazamiento)
+{
+    cod_ins codigo;
+
+    memcpy(&codigo,  buffer + (*desplazamiento), sizeof(cod_ins));
+
+    (*desplazamiento) += sizeof(cod_ins);
+    
+    return codigo;
+};
+
 /*----------Fin Serializacion----------*/

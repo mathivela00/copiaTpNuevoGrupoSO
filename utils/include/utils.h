@@ -12,6 +12,39 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+typedef enum instrucciones
+{
+	SET,
+	SUM,
+	SUB,
+	MOV_IN,
+	MOV_OUT,
+    RESIZE,
+    JNZ,
+	COPY_STRING,
+	IO_GEN_SLEEP,
+    IO_STDIN_READ,
+    IO_STDOUT_WRITE,
+    IO_FS_CREATE,
+    IO_FS_DELETE,
+    IO_FS_TRUNCATE,
+    IO_FS_WRITE,
+    IO_FS_READ,
+	WAIT,
+	SIGNAL,
+	EXIT
+} cod_ins;
+
+typedef struct instruccion
+{
+    cod_ins ins;
+    char* arg1;
+    char* arg2;
+    char* arg3;
+    char* arg4;
+    char* arg5;
+} t_instruccion;
+
 typedef enum 
 {
     NUEVO,
