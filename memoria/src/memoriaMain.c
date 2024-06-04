@@ -26,20 +26,20 @@ int main(int argc, char* argv[]) {
     //OBTENER VALORES CONFIG
     puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
     log_info(logger, "PUERTO leido: %s", puerto_escucha);
-
     path_base = config_get_string_value(config, "PATH_INSTRUCCIONES");
-
     tam_memoria = config_get_int_value(config, "TAM_MEMORIA");
     log_info(logger, "TAMANIO MEMORIA: %d", tam_memoria);
-
     tam_pagina = config_get_int_value(config, "TAM_PAGINA");
     log_info(logger, "TAMANIO PAGINA: %d", tam_pagina);
-
     retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
     log_info(logger, "RETARDO RESPUESTA: %d", retardo);
 
+    //iniciar Server de CPU
+    // socket_escucha = iniciar_servidor(puerto_escucha, logger);
+
     //esperar conexiones
 
+    // socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
     // socket_kernel_memoria = esperar_cliente(socket_escucha, logger);    
     // socket_entradasalida_memoria = esperar_cliente(socket_escucha, logger);
     
@@ -78,13 +78,8 @@ int main(int argc, char* argv[]) {
     char* path_parcial = "test_ins.txt"; //viene de kernel
     char* path = path_completo(path_base, path_parcial);
     // log_info(logger, "path de archivo: %s", path);
-    
     t_list* lista_instrucciones = leer_pseudocodigo(path);
-
-    //iniciar Server de CPU
-    socket_escucha = iniciar_servidor(puerto_escucha, logger);
-
-    socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
+    
 
     conexion_con_cpu(socket_cpu_memoria, lista_instrucciones);
     
@@ -145,7 +140,6 @@ t_list* leer_pseudocodigo(char* path){
     while (fgets(linea, 50, archivo) != NULL)
     {
         instr = parsear_instruccion(linea);
-        // log_info(logger, "Ins: %d", instr->ins);
         if (!instr) 
         {
             log_error(logger, "El archivo de pseudocodigo tiene errores/instrucciones invalidas");
@@ -369,9 +363,9 @@ void conexion_con_cpu(int socket_cpu_memoria, t_list* lista_instrucciones){
             log_info(logger, "CPU solicita instruccion, PID: %d, PC: %d", PID, PC);
 
             t_instruccion* sig_ins = get_ins(lista_instrucciones, PC);
-            usleep(retardo);
+            // retardo (usleep()?)
             enviar_instruccion(socket_cpu_memoria, sig_ins);
-            log_info(logger, "instruccion enviada");
+            log_info(logger, "Respuesta a Fecth PID: %d - Program Counter: %d", PID, PC);
             break;
         
         default:
