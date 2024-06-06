@@ -12,10 +12,11 @@ void iniciar_consola_interactiva(){
         if( leido != NULL && strcmp(leido, "") != 0){
             validacion_leido = validacion_de_ingreso_por_consola (leido);
             
-            if(!validacion_leido){
-                atender_instruccion_validada(leido);          
+            if(validacion_leido){
+                atender_instruccion_validada(leido);
+                log_trace(logger_debug, "Comando VALIDO");          
             }else{                
-                 log_error(logger, "Comando NO reconocido");
+                 log_error(logger_debug, "Comando NO reconocido");
             }
             free(leido);
         }

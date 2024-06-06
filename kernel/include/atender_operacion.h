@@ -12,20 +12,18 @@
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"
 
-#include "atender_operacion.h"
 #include "extern_globales.h"
 
 
 
-#ifndef TPANUAL_CONSOLA_H
-#define TPANUAL_CONSOLA_H
+#ifndef  ATENDER_OPERACION_H
+#define ATENDER_OPERACION_H
 
 
-bool validacion_de_ingreso_por_consola (char* leido);
-void iniciar_consola_interactiva();
-
-
+void atender_instruccion_validada(char* leido);
 
 
 
-#endif //TPANUAL_CONSOLA_H
+
+
+#endif //ATENDER_OPERACION_H

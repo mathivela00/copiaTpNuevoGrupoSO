@@ -51,9 +51,14 @@ int main(int argc, char* argv[]) {
     // CREO HILO ENTRADA-SALIDA
         pthread_t hilo_entradaSalida;
         pthread_create(&hilo_entradaSalida,NULL,(void*)atender_conexion_ENTRADASALIDA_KERNEL,NULL);
-        pthread_join(hilo_entradaSalida,NULL);
+        pthread_detach(hilo_entradaSalida,NULL);
 
-
+        
+    //  INICIO CONSOLA INTERACTIVA  
+        pthread_t hilo_consola_interactiva;
+        pthread_create(&hilo_consola_interactiva,NULL,(void*)iniciar_consola_interactiva,NULL);
+        pthread_join(hilo_consola_interactiva,NULL);  
+         
 
 
  
