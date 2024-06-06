@@ -53,14 +53,14 @@ int main(int argc, char* argv[]) {
 
     //Pruebas con memoria
     //crear conexion
-    socket_cpu_memoria = crear_conexion(ip_memoria, puerto_memoria);
+    // socket_cpu_memoria = crear_conexion(ip_memoria, puerto_memoria);
 
-    log_info(logger, "CE contenedor listo, datos: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, contexto_interno.PC, contexto_interno.AX, contexto_interno.EAX, contexto_interno.SI);
+    // log_info(logger, "CE contenedor listo, datos: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, contexto_interno.PC, contexto_interno.AX, contexto_interno.EAX, contexto_interno.SI);
 
-    op_code codopCE = recibir_operacion(socket_cpu_memoria);    
-    if (codopCE == CONTEXTO) {log_info(logger, "LLego un contexto de ejecucion");}
-    recibir_CE(socket_cpu_memoria, &PID, &contexto_interno);
-    log_info(logger, "datos nuevos CE contenedor: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, contexto_interno.PC, contexto_interno.AX, contexto_interno.EAX, contexto_interno.SI);
+    // op_code codopCE = recibir_operacion(socket_cpu_memoria);    
+    // if (codopCE == CONTEXTO) {log_info(logger, "LLego un contexto de ejecucion");}
+    // recibir_CE(socket_cpu_memoria, &PID, &contexto_interno);
+    // log_info(logger, "datos nuevos CE contenedor: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, contexto_interno.PC, contexto_interno.AX, contexto_interno.EAX, contexto_interno.SI);
 
     // //Pruebas con kernel
     // //iniciar Server de CPU
@@ -80,11 +80,26 @@ int main(int argc, char* argv[]) {
     // recibir_mensaje(socket_cpu_kernel_dispatch, logger);
 
     // recibir_proceso(socket_cpu_kernel_dispatch);
-    while(true){
-        t_instruccion* ins_actual = fetch(PID, contexto_interno.PC, socket_cpu_memoria);
-
-    }
+    // while(true){
+    //     t_instruccion* ins_actual = fetch(PID, contexto_interno.PC, socket_cpu_memoria);
+    //     ejecutar_instruccion(PID, &contexto_interno, ins_actual);
+    //     // check_interrupt(interrupcion);
+    // }
+    log_info(logger, "I: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
+    t_instruccion* ins1 = malloc(sizeof(t_instruccion));
+    ins1->ins = SET;
+    ins1->arg1 = "AX";
+    ins1->arg2 = "5";
+    t_instruccion* ins2 = malloc(sizeof(t_instruccion));
+    ins2->ins = SET;
+    ins2->arg1 = "AX";
+    ins2->arg2 = "10";
+    ejecutar_instruccion(PID, &contexto_interno, ins1);
+    log_info(logger, "II: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
+    ejecutar_instruccion(PID, &contexto_interno, ins2);
+    log_info(logger, "III: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
     
+
 
     if (socket_cpu_kernel_dispatch) {liberar_conexion(socket_cpu_kernel_dispatch);}
     if (socket_cpu_kernel_interrupt) {liberar_conexion(socket_cpu_kernel_interrupt);}
@@ -129,4 +144,50 @@ t_instruccion* recibir_instruccion(int socket_cpu_memoria){
     free(buffer);
 
     return instr;
+}
+
+void ejecutar_instruccion(uint32_t PID, t_contexto_ejecucion* contexto_interno, t_instruccion* ins_actual){
+    cod_ins codigo = ins_actual->ins;
+
+    switch (codigo)
+    {
+    case SET:
+        log_info(logger,"PID: %d - Ejecutando: SET - %s %s", PID, ins_actual->arg1, ins_actual->arg2);
+        void* registro = direccion_registro(contexto_interno, ins_actual->arg1);
+        int tamanio = tam_registro(ins_actual->arg1);
+        int valor = atoi(ins_actual->arg2);
+
+        memcpy(registro, &valor, tamanio);
+        contexto_interno->PC++;
+        break;
+    default:
+        break;
+    }
+}
+
+void* direccion_registro(t_contexto_ejecucion* contexto, char* registro){
+
+    if (!string_equals_ignore_case(registro, "AX"))  {return &(contexto->AX);}
+    else if (!string_equals_ignore_case(registro, "BX"))  {return &(contexto->BX);}
+    else if (!string_equals_ignore_case(registro, "CX"))  {return &(contexto->CX);}
+    else if (!string_equals_ignore_case(registro, "DX"))  {return &(contexto->DX);}
+    else if (!string_equals_ignore_case(registro, "EAX"))  {return &(contexto->EAX);}
+    else if (!string_equals_ignore_case(registro, "EBX"))  {return &(contexto->EBX);}
+    else if (!string_equals_ignore_case(registro, "ECX"))  {return &(contexto->ECX);}
+    else if (!string_equals_ignore_case(registro, "EDX"))  {return &(contexto->EDX);}
+    else if (!string_equals_ignore_case(registro, "SI"))  {return &(contexto->SI);}
+    else if (!string_equals_ignore_case(registro, "DI"))  {return &(contexto->DI);}
+    else {
+        log_error(logger, "Error en traduccion de string a registro");
+        return NULL;
+    }
+}
+
+int tam_registro(char* registro){
+    if (!string_equals_ignore_case(registro, "AX")
+    ||(!string_equals_ignore_case(registro, "BX"))
+    ||(!string_equals_ignore_case(registro, "CX"))
+    ||(!string_equals_ignore_case(registro, "DX"))
+    )   {return 8;}
+    else {return 32;}
 }
