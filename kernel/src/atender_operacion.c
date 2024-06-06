@@ -9,8 +9,7 @@ void atender_instruccion_validada(char* leido)
         
 
     }else if (strcmp(array_de_comando[0],"INICIAR_PROCESO")==0){
-        
-        
+        iniciar_proceso(leido);        
     }else if (strcmp(array_de_comando[0],"FINALIZAR_PROCESO")==0){
         
         
@@ -30,3 +29,37 @@ void atender_instruccion_validada(char* leido)
 
 
 }
+
+
+void iniciar_proceso(char*leido){
+    t_pcb *new_pcb= malloc(sizeof(t_pcb));
+    
+    new_pcb->PID=asignar_pid();
+    new_pcb->estado=NUEVO; 
+    new_pcb->quantum= quantum;
+    
+    new_pcb->CE.PC=0;
+    new_pcb->CE.AX=0;
+    new_pcb->CE.BX=0;
+    new_pcb->CE.CX=0;
+    new_pcb->CE.DX=0;
+    new_pcb->CE.EAX=0;
+    new_pcb->CE.EBX=0;
+    new_pcb->CE.ECX=0;
+    new_pcb->CE.EDX=0;
+    new_pcb->CE.SI=0;
+    new_pcb->CE.DI=0;
+
+
+
+
+
+}
+
+
+
+
+
+
+
+    

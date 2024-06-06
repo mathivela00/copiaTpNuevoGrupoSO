@@ -8,6 +8,10 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#include <sys/types.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
+#include <pthread.h>
 
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"

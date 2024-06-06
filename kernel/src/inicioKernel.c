@@ -5,6 +5,7 @@ void iniciar_Kernel(){
     iniciar_logs();
 	iniciar_configs();
 	//imprimir_configs();
+	iniciar_colas_de_estado();
 
 
 }
@@ -42,12 +43,23 @@ void iniciar_configs(){
     ip_memoria = config_get_string_value(config, "IP_MEMORIA");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
     puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-	
-/*	ALGORITMO_PLANIFICACION=config_get_string_value(kernelConfig,"ALGORITMO_PLANIFICACION");
-	QUANTUM=config_get_int_value(kernelConfig,"QUANTUM");
-	RECURSOS=config_get_array_value(kernelConfig,"RECURSOS");
-	INSTANCIAS_RECURSOS=config_get_array_value(kernelConfig,"INSTANCIAS_RECURSOS");
-	GRADO_MULTIPROGRAMACION=config_get_string_value(kernelConfig,"GRADO_MULTIPROGRAMACION");
-*/
+	algoritmo_planificacion=config_get_string_value(kernelConfig,"ALGORITMO_PLANIFICACION");
+	quantum=config_get_int_value(kernelConfig,"QUANTUM");
+	recursos=config_get_array_value(kernelConfig,"RECURSOS");
+	instancias_recursos=config_get_array_value(kernelConfig,"INSTANCIAS_RECURSOS");
+	grado_multiprogramacion=config_get_string_value(kernelConfig,"GRADO_MULTIPROGRAMACION");
+
 }
 
+void iniciar_colas_de_estado(){
+
+    cola_new = queue_create();
+	cola_ready = queue_create();
+	cola_exit = queue_create();
+
+
+
+
+
+
+}

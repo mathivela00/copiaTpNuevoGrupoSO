@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include<commons/log.h>
 #include<commons/string.h>
 #include<commons/config.h>
@@ -21,7 +22,7 @@
 
 
 void atender_instruccion_validada(char* leido);
-
+void iniciar_proceso(char*leido);
 
 
 

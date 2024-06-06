@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
 
 
     decir_hola("Kernel");
-//INICIALIZO LOS LOGS Y CONGIFURACIONES 
+//INICIALIZO LOS LOGS Y CONGIFURACIONES Y COLAS DE ESTADO
     iniciar_Kernel();
 
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     // CREO HILO ENTRADA-SALIDA
         pthread_t hilo_entradaSalida;
         pthread_create(&hilo_entradaSalida,NULL,(void*)atender_conexion_ENTRADASALIDA_KERNEL,NULL);
-        pthread_detach(hilo_entradaSalida,NULL);
+        pthread_detach(hilo_entradaSalida);
 
         
     //  INICIO CONSOLA INTERACTIVA  
@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) {
 
     //Planificacion
     //pthread_create(&hilo_sts, NULL, (void*)pcp_planificar, NULL);
+     ///cuando continues con planificacion fijate que hay que cambiar: pthread_join(hilo_consola_interactiva,NULL); ->pthread_detach(hilo_entradaSalida,NULL); si no se clava el progama ahi y no llega a planificacion
 
 
     if (socket_kernel_cpu_dispatch) {liberar_conexion(socket_kernel_cpu_dispatch);}
@@ -75,5 +76,13 @@ int main(int argc, char* argv[]) {
     if (socket_memoria_kernel) {liberar_conexion(socket_memoria_kernel);}
     if (socket_entradasalida_kernel) {liberar_conexion(socket_entradasalida_kernel);}
     if (socket_escucha) {liberar_conexion(socket_escucha);}
+   
+   
+   
+   
+   end_program(logger, config);
+
+   
+   
     return 0;
 }
