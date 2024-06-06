@@ -4,9 +4,9 @@
 
 #ifndef TPANUAL_RECURSOS_H
 #define TPANUAL_RECURSOS_H
-
-#include "planificacion.h"
 #include "../../utils/include/utils.h"
+#include "../../utils/include/conexiones.h"
+#include "planificacion.h"
 #include <commons/collections/dictionary.h>
 #include "extern_globales.h"
 

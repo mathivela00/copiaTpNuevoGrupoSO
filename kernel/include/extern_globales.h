@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <pthread.h>
 
+#include "../../utils/include/utils.h"
+#include "../../utils/include/conexiones.h"
 #include "extern_globales.h"
 
  extern char* ip_memoria;
@@ -36,9 +38,8 @@ extern int conexion_CPU_DISPATCH;
 extern t_log* logger;
 extern t_config *config;
 
-/*
-#include <utils/hello.h>
 
+/*
 extern char* ALGORITMO_PLANIFICACION;
 extern int QUANTUM;
 extern char** RECURSOS;

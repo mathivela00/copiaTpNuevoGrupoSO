@@ -1,7 +1,7 @@
 #include "../include/servicios_kernel.h"
 
-int asignar pid(){
-
+int asignar_pid(){
+    
     int valor_pid;
     pthread_mutex_lock(&mutex_pid);
     valor_pid= identificador_PID;
