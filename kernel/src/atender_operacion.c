@@ -32,12 +32,12 @@ void atender_instruccion_validada(char* leido)
 
 
 void iniciar_proceso(char*leido){
+    char** array_de_comando= string_split (leido, " ");
+
     t_pcb *new_pcb= malloc(sizeof(t_pcb));
-    
     new_pcb->PID=asignar_pid();
     new_pcb->estado=NUEVO; 
     new_pcb->quantum= quantum;
-    
     new_pcb->CE.PC=0;
     new_pcb->CE.AX=0;
     new_pcb->CE.BX=0;
@@ -51,6 +51,7 @@ void iniciar_proceso(char*leido){
     new_pcb->CE.DI=0;
 
 
+    
 
 
 

@@ -56,16 +56,6 @@ extern t_queue *cola_exit;
 
 
 
-/*
-extern char* ALGORITMO_PLANIFICACION;
-extern int QUANTUM;
-extern char** RECURSOS;
-extern char** INSTANCIAS_RECURSOS;
-extern char* GRADO_MULTIPROGRAMACION;
-
-
-*/
-
 
 
 
