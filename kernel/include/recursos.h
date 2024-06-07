@@ -4,9 +4,23 @@
 
 #ifndef TPANUAL_RECURSOS_H
 #define TPANUAL_RECURSOS_H
+#include <stdlib.h>
+#include <stdio.h>
+#include<commons/log.h>
+#include<commons/string.h>
+#include<commons/config.h>
+#include<readline/readline.h>
+#include <readline/history.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <sys/types.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
 
-#include "planificacion.h"
 #include "../../utils/include/utils.h"
+#include "../../utils/include/conexiones.h"
+#include "planificacion.h"
 #include <commons/collections/dictionary.h>
 #include "extern_globales.h"
 

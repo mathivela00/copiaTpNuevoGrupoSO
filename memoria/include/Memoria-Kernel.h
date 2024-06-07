@@ -1,5 +1,5 @@
-#ifndef KERNEL_CPU_DISPATCH_H_
-#define KERNEL_CPU_DISPATCH_H_
+#ifndef MEMORIA_KERNEL_H_
+#define MEMORIA_KERNEL_H_
 
 
 #include <stdlib.h>
@@ -12,16 +12,13 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/types.h>
-#include <semaphore.h>
-#include <commons/collections/queue.h>
-#include <pthread.h>
+#include <string.h>
 
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"
-
 #include "extern_globales.h"
 
-void atender_conexion_CPU_DISPATCH_KERNEL ();
+void atender_conexion_KERNEL_MEMORIA();
 
 
 
@@ -33,4 +30,7 @@ void atender_conexion_CPU_DISPATCH_KERNEL ();
 
 
 
-#endif /*  KERNEL_CPU_DISPATCH_H_ */
+
+
+
+#endif /*  MEMORIA_KERNEL_H_ */

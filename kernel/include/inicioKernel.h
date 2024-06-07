@@ -11,7 +11,13 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
+#include <pthread.h>
 
+
+
+#include "atender_operacion.h"
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"
 
@@ -21,10 +27,12 @@
 void iniciar_Kernel(void);
 void iniciar_logs(void);
 void iniciar_configs(void);
+void iniciar_colas_de_estado();
 
 
-
-
+t_queue *cola_new;
+t_queue *cola_ready;
+t_queue *cola_exit;
 
 
 

@@ -4,6 +4,9 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include <readline/readline.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
+#include <pthread.h>
 
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"
@@ -13,6 +16,7 @@
 #include "Kernel-EntradaSalida.h"
 #include "Kernel-Memoria.h"
 #include "inicioKernel.h"
+#include "consola.h"
 
 
 #include "extern_globales.h"
@@ -25,6 +29,15 @@ pthread_t hilo_sts;
     char* puerto_cpu_dispatch;
     char* puerto_cpu_interrupt;
     char* puerto_escucha;
+    char* algoritmo_planificacion;
+	int quantum;
+	char** recursos[];
+	char** instancias_recursos[];
+	int grado_multiprogramacion;
+
+
+
+
 
     int socket_kernel_cpu_dispatch;
     int socket_kernel_cpu_interrupt; //queda libre por ahora

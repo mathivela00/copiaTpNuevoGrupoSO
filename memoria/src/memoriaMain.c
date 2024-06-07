@@ -1,25 +1,12 @@
 #include "../include/memoriaMain.h"
 
+
 int main(int argc, char* argv[]) {
-
-    //INICIALIZO LOGGER
-    logger = start_logger("log_memoria.log", "LOG MEMORIA", LOG_LEVEL_INFO);
-
-    //INSTACION CONFIG
-    t_config* config;
-    //INICIALIZO config
-    config = start_config("./memoria.config");
-
-    //OBTENER VALORES CONFIG
-    puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-    log_info(logger, "PUERTO leido: %s", puerto_escucha);
-    path_base = config_get_string_value(config, "PATH_INSTRUCCIONES");
-    tam_memoria = config_get_int_value(config, "TAM_MEMORIA");
-    log_info(logger, "TAMANIO MEMORIA: %d", tam_memoria);
-    tam_pagina = config_get_int_value(config, "TAM_PAGINA");
-    log_info(logger, "TAMANIO PAGINA: %d", tam_pagina);
-    retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
-    log_info(logger, "RETARDO RESPUESTA: %d", retardo);
+    /
+    ///////////////////////////////////LAS CONFIGURACIONES LOS INICIOS DE LOGGER LOS PASE A LA CARPETA INICIO KERNEL
+    ///////////////////////////////////LAS DECLARACIONES DE LAS VARIABLES LAS PASE A LAS CARPETAS.H
+    ///////////////////////////////////LA CARPETA EXTERN_GLOBALS.C ES PARA COMPARTIR LAS VARIABLES QUE NECESITAS QUE SE VEAN DE TODAS LAS DEMAS CARPETAS DEL MODULO (AGREGAR EXTERN ANTES)
+    ///////////////////////////////////AGREGAR EXTERN ANTES ES PARA QUE EL COMPILADOR NO TOME COMO QUE ESTAR DECLARANDO LA VARIABLE DOS VECES   
 
     //iniciar Server
     socket_escucha = iniciar_servidor(puerto_escucha, logger);

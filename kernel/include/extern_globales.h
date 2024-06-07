@@ -12,15 +12,26 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
 
-#include "extern_globales.h"
 
- extern char* ip_memoria;
- extern char* puerto_memoria;
- extern char* ip_cpu;
- extern char* puerto_cpu_dispatch;
- extern char* puerto_cpu_interrupt;
- extern char* puerto_escucha;
+#include "../../utils/include/utils.h"
+#include "../../utils/include/conexiones.h"
+
+extern char* ip_memoria;
+extern char* puerto_memoria;
+extern char* ip_cpu;
+extern char* puerto_cpu_dispatch;
+extern char* puerto_cpu_interrupt;
+extern char* puerto_escucha;
+extern char* algoritmo_planificacion;
+extern int quantum;
+extern char** recursos[];
+extern char** instancias_recursos[];
+extern int grado_multiprogramacion;
+
+
 
 extern int socket_kernel_cpu_dispatch;
 extern int socket_kernel_cpu_interrupt; //queda libre por ahora
@@ -36,17 +47,14 @@ extern int conexion_CPU_DISPATCH;
 extern t_log* logger;
 extern t_config *config;
 
-/*
-#include <utils/hello.h>
 
-extern char* ALGORITMO_PLANIFICACION;
-extern int QUANTUM;
-extern char** RECURSOS;
-extern char** INSTANCIAS_RECURSOS;
-extern char* GRADO_MULTIPROGRAMACION;
+extern t_queue *cola_new;
+extern t_queue *cola_ready;
+extern t_queue *cola_exit;
 
 
-*/
+
+
 
 
 

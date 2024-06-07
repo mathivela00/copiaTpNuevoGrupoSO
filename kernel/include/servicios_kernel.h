@@ -12,15 +12,21 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#include "../../utils/include/utils.h"
+#include "../../utils/include/conexiones.h"
+
+#include <pthread.h>
+#include <semaphore.h>
+#include <commons/collections/queue.h>
 
 
 #include "extern_globales.h"
 
 
-int identificador_PID =1;
+uint32_t identificador_PID =1;
 pthread_mutex_t mutex_pid;
 
-int asignar pid();
+uint32_t asignar_pid();
 
 
 

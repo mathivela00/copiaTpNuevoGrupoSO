@@ -15,6 +15,21 @@
 
 /*----------Estructuras----------*/
 
+// ---------- CÓDIGOS DE OPERACIÓN ---------- //
+typedef enum{
+    CE,
+	SIG_INS,
+	PARA_MEMO,
+	TAM_PAG,
+    CARGAR_PROCESO,
+    ELIMINAR_PROCESO,
+    PAGE_FAULT,
+	RECIBIR_CE_DISPATCH,
+	MENSAJE,
+    FETCH
+} op_code;
+
+/*
 typedef enum CODIGOS_DE_OPERACIONES
 {
     MENSAJE,
@@ -23,7 +38,7 @@ typedef enum CODIGOS_DE_OPERACIONES
     FETCH
 
 } op_code;
-
+*/
 typedef enum CODIGOS_DE_INTERRUPCIONES
 {
     INT_NO,
