@@ -85,20 +85,28 @@ int main(int argc, char* argv[]) {
     //     ejecutar_instruccion(PID, &contexto_interno, ins_actual);
     //     // check_interrupt(interrupcion);
     // }
-    log_info(logger, "I: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
+    log_info(logger, "I: PID: %d, PC: %d, EAX: %d", PID, contexto_interno.PC, contexto_interno.EAX);
     t_instruccion* ins1 = malloc(sizeof(t_instruccion));
     ins1->ins = SET;
-    ins1->arg1 = "AX";
-    ins1->arg2 = "5";
+    ins1->arg1 = "EAX";
+    ins1->arg2 = "15";
+
+    ejecutar_instruccion(PID, &contexto_interno, ins1);
+    log_info(logger, "II: PID: %d, PC: %d, EAX: %d", PID, contexto_interno.PC, contexto_interno.EAX);
+    
     t_instruccion* ins2 = malloc(sizeof(t_instruccion));
     ins2->ins = SET;
-    ins2->arg1 = "AX";
-    ins2->arg2 = "10";
-    ejecutar_instruccion(PID, &contexto_interno, ins1);
-    log_info(logger, "II: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
+    ins2->arg1 = "EBX";
+    ins2->arg2 = "5";
     ejecutar_instruccion(PID, &contexto_interno, ins2);
-    log_info(logger, "III: PID: %d, PC: %d, AX: %d", PID, contexto_interno.PC, contexto_interno.AX);
+    log_info(logger, "III: PID: %d, PC: %d, EBX: %d", PID, contexto_interno.PC, contexto_interno.EBX);
     
+    t_instruccion* ins3 = malloc(sizeof(t_instruccion));
+    ins3->ins = SUB;
+    ins3->arg1 = "EAX";
+    ins3->arg2 = "EBX";
+    ejecutar_instruccion(PID, &contexto_interno, ins3);
+    log_info(logger, "IV: PID: %d, PC: %d, EAX: %d", PID, contexto_interno.PC, contexto_interno.EAX);
 
 
     if (socket_cpu_kernel_dispatch) {liberar_conexion(socket_cpu_kernel_dispatch);}
@@ -148,6 +156,9 @@ t_instruccion* recibir_instruccion(int socket_cpu_memoria){
 
 void ejecutar_instruccion(uint32_t PID, t_contexto_ejecucion* contexto_interno, t_instruccion* ins_actual){
     cod_ins codigo = ins_actual->ins;
+    int tamanio_d;
+    int tamanio_o;
+    int valor;
 
     switch (codigo)
     {
@@ -155,10 +166,67 @@ void ejecutar_instruccion(uint32_t PID, t_contexto_ejecucion* contexto_interno, 
         log_info(logger,"PID: %d - Ejecutando: SET - %s %s", PID, ins_actual->arg1, ins_actual->arg2);
         void* registro = direccion_registro(contexto_interno, ins_actual->arg1);
         int tamanio = tam_registro(ins_actual->arg1);
-        int valor = atoi(ins_actual->arg2);
+        valor = atoi(ins_actual->arg2);
 
         memcpy(registro, &valor, tamanio);
         contexto_interno->PC++;
+        break;
+    case SUM:
+        log_info(logger,"PID: %d - Ejecutando: SUM - %s %s", PID, ins_actual->arg1, ins_actual->arg2);
+        tamanio_d = tam_registro(ins_actual->arg1);
+        tamanio_o = tam_registro(ins_actual->arg2);
+        if (tamanio_d != tamanio_o){
+            log_error(logger, "SUM trata de sumar registros de distinto tamaño");
+            ins_actual->ins = EXIT; //al tener un error, el proceso sale de CPU
+            //falta el break a proposito
+        }
+        else{   
+            if (tamanio_d==8){
+            uint8_t* registro_destino = direccion_registro(contexto_interno, ins_actual->arg1);
+            uint8_t* registro_origen = direccion_registro(contexto_interno, ins_actual->arg2);
+            uint8_t valor8 = *registro_destino + *registro_origen;
+            memcpy(registro_destino, &valor8, sizeof(valor8));
+            }
+            else{
+            uint32_t* registro_destino = direccion_registro(contexto_interno, ins_actual->arg1);
+            uint32_t* registro_origen = direccion_registro(contexto_interno, ins_actual->arg2);
+            uint32_t valor32 = *registro_destino + *registro_origen;
+            memcpy(registro_destino, &valor32, sizeof(valor32));
+            }
+            contexto_interno->PC++;
+            break;
+        }
+    case SUB:
+        log_info(logger,"PID: %d - Ejecutando: SUB - %s %s", PID, ins_actual->arg1, ins_actual->arg2);
+        tamanio_d = tam_registro(ins_actual->arg1);
+        tamanio_o = tam_registro(ins_actual->arg2);
+        if (tamanio_d != tamanio_o){
+            log_error(logger, "SUB trata de restar registros de distinto tamaño");
+            ins_actual->ins = EXIT; //al tener un error, el proceso sale de CPU
+            //falta el break a proposito
+        }
+        else{   
+            if (tamanio_d==8){
+            uint8_t* registro_destino = direccion_registro(contexto_interno, ins_actual->arg1);
+            uint8_t* registro_origen = direccion_registro(contexto_interno, ins_actual->arg2);
+            uint8_t valor = *registro_destino - *registro_origen;
+            memcpy(registro_destino, &valor, sizeof(valor));
+            }
+            else{
+            uint32_t* registro_destino = direccion_registro(contexto_interno, ins_actual->arg1);
+            uint32_t* registro_origen = direccion_registro(contexto_interno, ins_actual->arg2);
+            uint32_t valor = *registro_destino - *registro_origen;
+            memcpy(registro_destino, &valor, sizeof(valor));
+            }
+            contexto_interno->PC++;
+            break;
+        }
+        break;
+    case JNZ:
+        break;
+    case IO_GEN_SLEEP:
+        break;
+    case EXIT:
         break;
     default:
         break;
@@ -167,16 +235,16 @@ void ejecutar_instruccion(uint32_t PID, t_contexto_ejecucion* contexto_interno, 
 
 void* direccion_registro(t_contexto_ejecucion* contexto, char* registro){
 
-    if (!string_equals_ignore_case(registro, "AX"))  {return &(contexto->AX);}
-    else if (!string_equals_ignore_case(registro, "BX"))  {return &(contexto->BX);}
-    else if (!string_equals_ignore_case(registro, "CX"))  {return &(contexto->CX);}
-    else if (!string_equals_ignore_case(registro, "DX"))  {return &(contexto->DX);}
-    else if (!string_equals_ignore_case(registro, "EAX"))  {return &(contexto->EAX);}
-    else if (!string_equals_ignore_case(registro, "EBX"))  {return &(contexto->EBX);}
-    else if (!string_equals_ignore_case(registro, "ECX"))  {return &(contexto->ECX);}
-    else if (!string_equals_ignore_case(registro, "EDX"))  {return &(contexto->EDX);}
-    else if (!string_equals_ignore_case(registro, "SI"))  {return &(contexto->SI);}
-    else if (!string_equals_ignore_case(registro, "DI"))  {return &(contexto->DI);}
+    if (string_equals_ignore_case(registro, "AX"))  {return &(contexto->AX);}
+    else if (string_equals_ignore_case(registro, "BX"))  {return &(contexto->BX);}
+    else if (string_equals_ignore_case(registro, "CX"))  {return &(contexto->CX);}
+    else if (string_equals_ignore_case(registro, "DX"))  {return &(contexto->DX);}
+    else if (string_equals_ignore_case(registro, "EAX"))  {return &(contexto->EAX);}
+    else if (string_equals_ignore_case(registro, "EBX"))  {return &(contexto->EBX);}
+    else if (string_equals_ignore_case(registro, "ECX"))  {return &(contexto->ECX);}
+    else if (string_equals_ignore_case(registro, "EDX"))  {return &(contexto->EDX);}
+    else if (string_equals_ignore_case(registro, "SI"))  {return &(contexto->SI);}
+    else if (string_equals_ignore_case(registro, "DI"))  {return &(contexto->DI);}
     else {
         log_error(logger, "Error en traduccion de string a registro");
         return NULL;
