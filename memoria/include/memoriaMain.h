@@ -7,6 +7,17 @@
 #include "../../utils/include/utils.h"
 #include "../../utils/include/conexiones.h"
 
+t_log* logger;
+char* path_base;
+int tam_pagina;
+int tam_memoria;
+int retardo;
+
+char* puerto_escucha;
+int socket_cpu_memoria;
+int socket_kernel_memoria;
+int socket_entradasalida_memoria;
+int socket_escucha;
 
 // Conexiones
 void conexion_con_cpu(int socket_cpu_memoria, t_list* lista_instrucciones);

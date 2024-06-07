@@ -1,19 +1,6 @@
 #include "../include/memoriaMain.h"
 
-t_log* logger;
-char* path_base;
-int tam_pagina;
-int tam_memoria;
-int retardo;
-
 int main(int argc, char* argv[]) {
-
-    //SERVER
-    char* puerto_escucha;
-    int socket_cpu_memoria;
-    int socket_kernel_memoria;
-    int socket_entradasalida_memoria;
-    int socket_escucha;
 
     //INICIALIZO LOGGER
     logger = start_logger("log_memoria.log", "LOG MEMORIA", LOG_LEVEL_INFO);
@@ -34,47 +21,16 @@ int main(int argc, char* argv[]) {
     retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
     log_info(logger, "RETARDO RESPUESTA: %d", retardo);
 
-    //iniciar Server de CPU
-    // socket_escucha = iniciar_servidor(puerto_escucha, logger);
+    //iniciar Server
+    socket_escucha = iniciar_servidor(puerto_escucha, logger);
 
     //esperar conexiones
 
-    // socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
+    socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
     // socket_kernel_memoria = esperar_cliente(socket_escucha, logger);    
     // socket_entradasalida_memoria = esperar_cliente(socket_escucha, logger);
     
-    //Pruebas con CPU
-    //enviar mensaje a cpu
-    // enviar_mensaje("MEMORIA manda mensaje a cpu", socket_cpu_memoria);
-    // log_info(logger, "Se envio el primer mensaje a cpu");
-
-    //recibir respuesta de cpu
-    // op_code codop1 = recibir_operacion(socket_cpu_memoria);
-    
-    //if (codop1 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    //else {log_info(logger, "LLego otra cosa");}
-    //recibir_mensaje(socket_cpu_memoria, logger);
-
-    // uint32_t PID = 1;
-    // t_contexto_ejecucion CE;
-    // CE.PC = 2;
-    // CE.AX = 1;
-    // CE.BX = 0;
-    // CE.CX = 0;
-    // CE.DX = 0;
-    // CE.EAX = 32;
-    // CE.EBX = 0;
-    // CE.ECX = 0;
-    // CE.EDX = 0;
-    // CE.SI = 0;
-    // CE.DI = 0;
-    // log_info(logger, "CE listo para enviar, datos: PID=%d, PC=%d, AX=%d, EAX=%d, SI=%d", PID, CE.PC, CE.AX, CE.EAX, CE.SI);
-    
-    // enviar_CE(socket_cpu_memoria, PID, CE);
-    // log_info(logger, "CE enviado con exito");
-    
     // Test local obtencion de instrucciones
-
     char* path_parcial = "test_ins.txt"; //viene de kernel
     char* path = path_completo(path_base, path_parcial);
     // log_info(logger, "path de archivo: %s", path);
@@ -83,39 +39,6 @@ int main(int argc, char* argv[]) {
 
     conexion_con_cpu(socket_cpu_memoria, lista_instrucciones);
     
-    // // Pruebas creacion de lista de instrucciones
-    // t_instruccion* ins0 = get_ins(lista_instrucciones, 0);
-    // t_instruccion* ins2 = get_ins(lista_instrucciones, 2);
-    // t_instruccion* ins4 = get_ins(lista_instrucciones, 4);
-    // t_instruccion* ins5 = get_ins(lista_instrucciones, 5);
-    // log_info(logger, "codigo instruccion 0: %d", ins0->ins);
-    // log_info(logger, "codigo instruccion 2: %d", ins2->ins);
-    // log_info(logger, "codigo instruccion 4: %d", ins4->ins);
-    // log_info(logger, "codigo instruccion 5: %d", ins5->ins);
-
-    // //Pruebas con kernel
-    // //enviar mensaje a kernel
-    // enviar_mensaje("MEMORIA manda mensaje a Kernel", socket_kernel_memoria);
-    // log_info(logger, "Se envio el primer mensaje a kernel");
-
-    // //recibir respuesta de kernel
-    // op_code codop2 = recibir_operacion(socket_kernel_memoria);
-    
-    // if (codop2 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    // else {log_info(logger, "LLego otra cosa");}
-    // recibir_mensaje(socket_kernel_memoria, logger);
-
-    // //Pruebas con entradasalida
-    // //enviar mensaje a entradasalida
-    // enviar_mensaje("MEMORIA manda mensaje a entradasalida", socket_entradasalida_memoria);
-    // log_info(logger, "Se envio el primer mensaje a entradasalida");
-
-    // //recibir respuesta de entradasalida
-    // op_code codop3 = recibir_operacion(socket_entradasalida_memoria);
-    
-    // if (codop3 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    // else {log_info(logger, "LLego otra cosa");}
-    // recibir_mensaje(socket_entradasalida_memoria, logger);
 
     if (socket_cpu_memoria) {liberar_conexion(socket_cpu_memoria);}
     if (socket_kernel_memoria) {liberar_conexion(socket_kernel_memoria);}
@@ -363,7 +286,7 @@ void conexion_con_cpu(int socket_cpu_memoria, t_list* lista_instrucciones){
             log_info(logger, "CPU solicita instruccion, PID: %d, PC: %d", PID, PC);
 
             t_instruccion* sig_ins = get_ins(lista_instrucciones, PC);
-            // retardo (usleep()?)
+            usleep(retardo);
             enviar_instruccion(socket_cpu_memoria, sig_ins);
             log_info(logger, "Respuesta a Fecth PID: %d - Program Counter: %d", PID, PC);
             break;
@@ -393,7 +316,7 @@ void enviar_instruccion(int socket_cpu_memoria, t_instruccion* instruccion){
     agregar_a_paquete_string(paquete, strlen(instruccion->arg4) + 1, instruccion->arg4);
     agregar_a_paquete_string(paquete, strlen(instruccion->arg5) + 1, instruccion->arg5);
 
-    enviar_paquete(paquete, socket);
+    enviar_paquete(paquete, socket_cpu_memoria);
     //log_info(logger, "Paquete enviado");
     eliminar_paquete(paquete);
 }
