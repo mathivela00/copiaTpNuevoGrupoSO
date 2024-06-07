@@ -30,10 +30,10 @@ pthread_t hilo_sts;
     char* puerto_cpu_interrupt;
     char* puerto_escucha;
     char* algoritmo_planificacion;
-	char* quantum;
-	char* recursos;
-	char* instancias_recursos;
-	char* grado_multiprogramacion;
+	int quantum;
+	char** recursos[];
+	char** instancias_recursos[];
+	int grado_multiprogramacion;
 
 
 
