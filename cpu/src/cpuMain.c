@@ -2,20 +2,9 @@
 
 int main(int argc, char* argv[]) {
 
-    char* ip_memoria;
-    char* puerto_memoria;
-    char* puerto_escucha_dispatch;
-    char* puerto_escucha_interrupt;
-
-    int socket_cpu_kernel_dispatch;
-    int socket_cpu_kernel_interrupt;
-    int socket_cpu_memoria;
-    int socket_escucha;
-
     uint32_t PID = 0;
     t_contexto_ejecucion contexto_interno;
-    int_code interrupcion = INT_NO;
-
+    interrupcion = INT_NO;
     decir_hola("CPU");
 
     //INICIALIZO LOGGER
@@ -78,13 +67,16 @@ int main(int argc, char* argv[]) {
     // if (codop2 == MENSAJE) {log_info(logger, "LLego un mensaje");}
     // else {log_info(logger, "LLego otra cosa");}
     // recibir_mensaje(socket_cpu_kernel_dispatch, logger);
+    recibir_proceso(socket_cpu_kernel_dispatch, &PID, &contexto_interno);
 
-    // recibir_proceso(socket_cpu_kernel_dispatch);
-    // while(true){
-    //     t_instruccion* ins_actual = fetch(PID, contexto_interno.PC, socket_cpu_memoria);
-    //     ejecutar_instruccion(PID, &contexto_interno, ins_actual);
-    //     // check_interrupt(interrupcion);
-    // }
+    while(true){
+        t_instruccion* ins_actual = fetch(PID, contexto_interno.PC, socket_cpu_memoria);
+        ejecutar_instruccion(PID, &contexto_interno, ins_actual);
+        if (check_interrupt(interrupcion, PID, contexto_interno)) {
+            recibir_proceso(socket_cpu_kernel_dispatch, &PID, &contexto_interno);
+        };
+    }
+    // Pruebas
     log_info(logger, "I: PID: %d, PC: %d, EAX: %d", PID, contexto_interno.PC, contexto_interno.EAX);
     t_instruccion* ins1 = malloc(sizeof(t_instruccion));
     ins1->ins = SET;
@@ -107,7 +99,7 @@ int main(int argc, char* argv[]) {
     ins3->arg2 = "EBX";
     ejecutar_instruccion(PID, &contexto_interno, ins3);
     log_info(logger, "IV: PID: %d, PC: %d, EAX: %d", PID, contexto_interno.PC, contexto_interno.EAX);
-
+    // Fin pruebas
 
     if (socket_cpu_kernel_dispatch) {liberar_conexion(socket_cpu_kernel_dispatch);}
     if (socket_cpu_kernel_interrupt) {liberar_conexion(socket_cpu_kernel_interrupt);}
@@ -258,4 +250,18 @@ int tam_registro(char* registro){
     ||(!string_equals_ignore_case(registro, "DX"))
     )   {return 8;}
     else {return 32;}
+}
+
+bool check_interrupt(int_code interrupcion, uint32_t PID, t_contexto_ejecucion contexto_interno){
+    if (interrupcion != INT_NO)
+    {
+        enviar_CE(socket_cpu_kernel_dispatch, PID, contexto_interno);
+        return true;
+    }
+    return false;
+}
+
+void recibir_proceso(int socket_cpu_kernel_dispatch, uint32_t* PID, t_contexto_ejecucion* contexto_interno){
+    recibir_CE(socket_cpu_kernel_dispatch, PID, contexto_interno);
+    interrupcion = INT_NO;
 }
