@@ -1,15 +1,18 @@
 #include "../include/memoriaMain.h"
 
 t_log* logger;
+char* puerto_escucha;
 char* path_base;
 int tam_pagina;
 int tam_memoria;
 int retardo;
+int cant_frames;
+void* memoria_usuario; 
+t_config* config;
 
 int main(int argc, char* argv[]) {
 
     //SERVER
-    char* puerto_escucha;
     int socket_cpu_memoria;
     int socket_kernel_memoria;
     int socket_entradasalida_memoria;
@@ -18,42 +21,8 @@ int main(int argc, char* argv[]) {
     //INICIALIZO LOGGER
     logger = start_logger("log_memoria.log", "LOG MEMORIA", LOG_LEVEL_INFO);
 
-    //INSTACION CONFIG
-    t_config* config;
-    //INICIALIZO config
-    config = start_config("./memoria.config");
-
-    //OBTENER VALORES CONFIG
-    puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-    log_info(logger, "PUERTO leido: %s", puerto_escucha);
-
-    path_base = config_get_string_value(config, "PATH_INSTRUCCIONES");
-
-    tam_memoria = config_get_int_value(config, "TAM_MEMORIA");
-    log_info(logger, "TAMANIO MEMORIA: %d", tam_memoria);
-
-    tam_pagina = config_get_int_value(config, "TAM_PAGINA");
-    log_info(logger, "TAMANIO PAGINA: %d", tam_pagina);
-
-    retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
-    log_info(logger, "RETARDO RESPUESTA: %d", retardo);
-
-    //esperar conexiones
-
-    // socket_kernel_memoria = esperar_cliente(socket_escucha, logger);    
-    // socket_entradasalida_memoria = esperar_cliente(socket_escucha, logger);
-    
-    //Pruebas con CPU
-    //enviar mensaje a cpu
-    // enviar_mensaje("MEMORIA manda mensaje a cpu", socket_cpu_memoria);
-    // log_info(logger, "Se envio el primer mensaje a cpu");
-
-    //recibir respuesta de cpu
-    // op_code codop1 = recibir_operacion(socket_cpu_memoria);
-    
-    //if (codop1 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    //else {log_info(logger, "LLego otra cosa");}
-    //recibir_mensaje(socket_cpu_memoria, logger);
+    //INICIALIZO CONFIG Y OBTENGO DATOS
+    cargarConfig();
 
     // uint32_t PID = 1;
     // t_contexto_ejecucion CE;
@@ -73,54 +42,21 @@ int main(int argc, char* argv[]) {
     // enviar_CE(socket_cpu_memoria, PID, CE);
     // log_info(logger, "CE enviado con exito");
     
-    // Test local obtencion de instrucciones
-
-    char* path_parcial = "test_ins.txt"; //viene de kernel
-    char* path = path_completo(path_base, path_parcial);
     // log_info(logger, "path de archivo: %s", path);
     
-    t_list* lista_instrucciones = leer_pseudocodigo(path);
-
     //iniciar Server de CPU
-    socket_escucha = iniciar_servidor(puerto_escucha, logger);
+    //socket_escucha = iniciar_servidor(puerto_escucha, logger);
 
-    socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
+    //socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
 
-    conexion_con_cpu(socket_cpu_memoria, lista_instrucciones);
+    //conexion_con_cpu(socket_cpu_memoria);
     
-    // // Pruebas creacion de lista de instrucciones
-    // t_instruccion* ins0 = get_ins(lista_instrucciones, 0);
-    // t_instruccion* ins2 = get_ins(lista_instrucciones, 2);
-    // t_instruccion* ins4 = get_ins(lista_instrucciones, 4);
-    // t_instruccion* ins5 = get_ins(lista_instrucciones, 5);
-    // log_info(logger, "codigo instruccion 0: %d", ins0->ins);
-    // log_info(logger, "codigo instruccion 2: %d", ins2->ins);
-    // log_info(logger, "codigo instruccion 4: %d", ins4->ins);
-    // log_info(logger, "codigo instruccion 5: %d", ins5->ins);
-
-    // //Pruebas con kernel
-    // //enviar mensaje a kernel
-    // enviar_mensaje("MEMORIA manda mensaje a Kernel", socket_kernel_memoria);
-    // log_info(logger, "Se envio el primer mensaje a kernel");
-
-    // //recibir respuesta de kernel
-    // op_code codop2 = recibir_operacion(socket_kernel_memoria);
+    // // pruebas memoria
+    inicializarMem();
     
-    // if (codop2 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    // else {log_info(logger, "LLego otra cosa");}
-    // recibir_mensaje(socket_kernel_memoria, logger);
+    escribir_memoria(100, "Hola Mundo");
 
-    // //Pruebas con entradasalida
-    // //enviar mensaje a entradasalida
-    // enviar_mensaje("MEMORIA manda mensaje a entradasalida", socket_entradasalida_memoria);
-    // log_info(logger, "Se envio el primer mensaje a entradasalida");
-
-    // //recibir respuesta de entradasalida
-    // op_code codop3 = recibir_operacion(socket_entradasalida_memoria);
-    
-    // if (codop3 == MENSAJE) {log_info(logger, "LLego un mensaje");}
-    // else {log_info(logger, "LLego otra cosa");}
-    // recibir_mensaje(socket_entradasalida_memoria, logger);
+    char* leido = leer_memoria(100);
 
     if (socket_cpu_memoria) {liberar_conexion(socket_cpu_memoria);}
     if (socket_kernel_memoria) {liberar_conexion(socket_kernel_memoria);}
@@ -128,6 +64,34 @@ int main(int argc, char* argv[]) {
     if (socket_escucha) {liberar_conexion(socket_escucha);}
 
     return 0;
+}
+
+void cargarConfig(){
+    //INICIALIZO config
+    config = start_config("./memoria.config");
+
+    if(config==NULL){
+        perror("Fallo al crear el archivo config");
+        exit(EXIT_FAILURE);
+    }
+
+    //OBTENER VALORES CONFIG
+    puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
+    log_info(logger, "PUERTO leido: %s", puerto_escucha);
+
+    path_base = config_get_string_value(config, "PATH_INSTRUCCIONES");
+    log_info(logger, "PATH: %s", path_base);
+
+    tam_memoria = config_get_int_value(config, "TAM_MEMORIA");
+    log_info(logger, "TAMANIO MEMORIA: %d", tam_memoria);
+
+    tam_pagina = config_get_int_value(config, "TAM_PAGINA");
+    log_info(logger, "TAMANIO PAGINA: %d", tam_pagina);
+
+    retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
+    log_info(logger, "RETARDO RESPUESTA: %d", retardo);
+
+    cant_frames = tam_memoria/tam_pagina;
 }
 
 t_list* leer_pseudocodigo(char* path){
@@ -156,7 +120,7 @@ t_list* leer_pseudocodigo(char* path){
     }
 
     fclose(archivo);
-    // log_info(logger, "Archivo pseudocodigo leido, cantidad lineas leidas: [%d]", list_size(lista_instrucciones));
+    log_info(logger, "Archivo pseudocodigo leido, cantidad lineas leidas: [%d]", list_size(lista_instrucciones));
 
     return lista_instrucciones;
 }
@@ -341,13 +305,13 @@ cod_ins hash_ins(char* ins){
     else return -1;
 }
 
-char* path_completo(char* path_base, char* path_parcial){
-    char* path = string_new();
-    string_append(&path, path_base);
-    string_append(&path, path_parcial);
+// char* path_completo(char* path_base, char* path_parcial){
+    //char* path = string_new();
+    //string_append(&path, path_base);
+    //string_append(&path, path_parcial);
 
-    return path;
-}
+    //return path;
+//}
 
 t_instruccion* get_ins(t_list* lista_instrucciones, uint32_t PC){
     t_instruccion* instruccion = malloc(sizeof(t_instruccion*));
@@ -355,7 +319,7 @@ t_instruccion* get_ins(t_list* lista_instrucciones, uint32_t PC){
     return instruccion;
 }
 
-void conexion_con_cpu(int socket_cpu_memoria, t_list* lista_instrucciones){
+void conexion_con_cpu(int socket_cpu_memoria){
     op_code codigo;
 
     while(true){
@@ -363,21 +327,26 @@ void conexion_con_cpu(int socket_cpu_memoria, t_list* lista_instrucciones){
         switch (codigo)
         {
         case FETCH:
-            uint32_t PID; //por ahora no hace nada, sera relevante cuando lleguen varios procesos por kernel 
-            uint32_t PC;
-            recibir_fetch(socket_cpu_memoria, &PID, &PC);
-            log_info(logger, "CPU solicita instruccion, PID: %d, PC: %d", PID, PC);
-
-            t_instruccion* sig_ins = get_ins(lista_instrucciones, PC);
-            usleep(retardo);
-            enviar_instruccion(socket_cpu_memoria, sig_ins);
-            log_info(logger, "instruccion enviada");
+            fetch(socket_cpu_memoria);
             break;
         
         default:
             break;
         }
     }
+}
+
+void fetch(int socket_cpu_memoria){
+    uint32_t PID; //por ahora no hace nada, sera relevante cuando lleguen varios procesos por kernel 
+    uint32_t PC;
+    recibir_fetch(socket_cpu_memoria, PID, PC);
+    log_info(logger, "CPU solicita instruccion, PID: %d, PC: %d", PID, PC);
+
+    t_list* lista_instrucciones = leer_pseudocodigo(path_base);
+    t_instruccion* sig_ins = get_ins(lista_instrucciones, PC);
+    usleep(retardo);
+    enviar_instruccion(socket_cpu_memoria, sig_ins);
+    log_info(logger, "instruccion enviada");
 }
 
 void recibir_fetch(int socket_cpu_memoria, uint32_t* PID, uint32_t* PC){
