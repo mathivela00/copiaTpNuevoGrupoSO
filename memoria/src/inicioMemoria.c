@@ -7,7 +7,7 @@ void iniciar_memoria(){
 
     //INICIALIZO LOGGER
     logger = start_logger("log_memoria.log", "LOG MEMORIA", LOG_LEVEL_INFO);
-
+    logger_debug = start_logger("log_memoria_debug.log", "LOG MEMORIA DEBUG", LOG_LEVEL_TRACE);
       
     //INICIALIZO config
     config = start_config("./memoria.config");
@@ -26,3 +26,4 @@ void iniciar_memoria(){
 
     retardo = config_get_int_value(config, "RETARDO_RESPUESTA");
     log_info(logger, "RETARDO RESPUESTA: %d", retardo);
+}

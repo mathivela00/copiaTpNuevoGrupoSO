@@ -12,15 +12,17 @@
 
 
 t_log* logger;
+t_log* logger_debug;
 char* path_base;
 int tam_pagina;
 int tam_memoria;
 int retardo;
 t_config* config;
-
-
 char* puerto_escucha;
-int socket_cpu_memoria;
+
+
+int socket_cpu_memoria_dispatch;
+int socket_cpu_memoria_interrupt;
 int socket_kernel_memoria;
 int socket_entradasalida_memoria;
 int socket_escucha;

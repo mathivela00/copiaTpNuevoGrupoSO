@@ -2,18 +2,39 @@
 
 
 int main(int argc, char* argv[]) {
-    /
-    ///////////////////////////////////LAS CONFIGURACIONES LOS INICIOS DE LOGGER LOS PASE A LA CARPETA INICIO KERNEL
-    ///////////////////////////////////LAS DECLARACIONES DE LAS VARIABLES LAS PASE A LAS CARPETAS.H
-    ///////////////////////////////////LA CARPETA EXTERN_GLOBALS.C ES PARA COMPARTIR LAS VARIABLES QUE NECESITAS QUE SE VEAN DE TODAS LAS DEMAS CARPETAS DEL MODULO (AGREGAR EXTERN ANTES)
-    ///////////////////////////////////AGREGAR EXTERN ANTES ES PARA QUE EL COMPILADOR NO TOME COMO QUE ESTAR DECLARANDO LA VARIABLE DOS VECES   
-
-    //esperar conexiones
-
-    // socket_kernel_memoria = esperar_cliente(socket_escucha, logger);    
-    // socket_entradasalida_memoria = esperar_cliente(socket_escucha, logger);
     
-    //Pruebas con CPU
+
+    iniciar_memoria();
+
+
+    //                  LAS CONFIGURACIONES LOS INICIOS DE LOGGER LOS PASE A LA CARPETA INICIO KERNEL
+    //                  LAS DECLARACIONES DE LAS VARIABLES LAS PASE A LAS CARPETAS.H
+    ///                 LA CARPETA EXTERN_GLOBALS.C ES PARA COMPARTIR LAS VARIABLES QUE NECESITAS QUE SE VEAN DE TODAS LAS DEMAS CARPETAS DEL MODULO (AGREGAR EXTERN ANTES)
+    //                  AGREGAR EXTERN ANTES ES PARA QUE EL COMPILADOR NO TOME COMO QUE ESTAR DECLARANDO LA VARIABLE DOS VECES   
+
+
+// INICIALIZO  SERVIDOR DE MEMORIA
+    socket_escucha=iniciar_servidor(puerto_escucha,logger_debug);
+
+
+// ESPERO QUE SE CONECTE CPU
+    log_trace(logger_debug,"Esperando que se conecte CPU");
+    socket_cpu_memoria_dispatch=esperar_cliente(socket_escucha,logger_debug);
+    socket_cpu_memoria_interrupt=esperar_cliente(socket_escucha,logger_debug);
+
+// ESPERO QUE SE CONECTE EL KERNEL
+    log_trace(logger_debug,"Esperando que se concte KERNEL");
+    socket_kernel_memoria=esperar_cliente(fd_memoria,logger_memoria);
+
+// CREO HILO ENTRADA-SALIDA Y ADENTRO DEL HILO SOPORTO MULTIPLES CONEXIONES
+        pthread_t hilo_entradaSalida_memoria;
+        pthread_create(&hilo_entradaSalida_memoria,NULL,(void*)atender_conexion_ENTRADASALIDA_MEMORIA,NULL);
+        pthread_detach(hilo_entradaSalida_memoria);
+
+
+ 
+
+     //Pruebas con CPU
     //enviar mensaje a cpu
     // enviar_mensaje("MEMORIA manda mensaje a cpu", socket_cpu_memoria);
     // log_info(logger, "Se envio el primer mensaje a cpu");

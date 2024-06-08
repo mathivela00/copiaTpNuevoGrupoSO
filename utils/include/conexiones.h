@@ -17,7 +17,7 @@
 
 // ---------- CÓDIGOS DE OPERACIÓN ---------- //
 typedef enum{
-    CE,
+    CONTEXTO,
 	SIG_INS,
 	PARA_MEMO,
 	TAM_PAG,
@@ -26,8 +26,7 @@ typedef enum{
     PAGE_FAULT,
 	RECIBIR_CE_DISPATCH,
 	MENSAJE,
-    FETCH
-} op_code;
+    } op_code;
 
 /*
 typedef enum CODIGOS_DE_OPERACIONES
