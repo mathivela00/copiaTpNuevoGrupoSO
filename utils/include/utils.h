@@ -56,7 +56,7 @@ typedef enum
     LISTO,
     EJECUCION,
     BLOQUEO,
-    EXIT
+    EXITT,
     ERROR
 } t_estado;
 

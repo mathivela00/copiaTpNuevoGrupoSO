@@ -19,7 +19,7 @@
 typedef enum{
     CONTEXTO,
 	SIG_INS,
-	PARA_MEMO,
+	FETCH,
 	TAM_PAG,
     CARGAR_PROCESO,
     ELIMINAR_PROCESO,

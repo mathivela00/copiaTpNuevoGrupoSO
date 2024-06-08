@@ -20,7 +20,7 @@
     }
 
 
-
+/*
 
     typedef struct
 {
@@ -42,7 +42,7 @@ typedef enum{
     } op_code;
 
 
-
+*/
 
 
 

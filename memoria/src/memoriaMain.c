@@ -24,15 +24,19 @@ int main(int argc, char* argv[]) {
 
 // ESPERO QUE SE CONECTE EL KERNEL
     log_trace(logger_debug,"Esperando que se concte KERNEL");
-    socket_kernel_memoria=esperar_cliente(fd_memoria,logger_memoria);
+    socket_kernel_memoria=esperar_cliente(socket_escucha,logger_debug);
 
 // CREO HILO ENTRADA-SALIDA Y ADENTRO DEL HILO SOPORTO MULTIPLES CONEXIONES
         pthread_t hilo_entradaSalida_memoria;
         pthread_create(&hilo_entradaSalida_memoria,NULL,(void*)atender_conexion_ENTRADASALIDA_MEMORIA,NULL);
         pthread_detach(hilo_entradaSalida_memoria);
 
-
+// CREO HILO KERNEL 
+        pthread_t hilo_kernel_memoria;
+        pthread_create(&hilo_kernel_memoria,NULL,(void*)atender_conexion_KERNEL_MEMORIA,NULL);
+        pthread_detach(hilo_kernel_memoria);
  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
      //Pruebas con CPU
     //enviar mensaje a cpu
@@ -72,12 +76,6 @@ int main(int argc, char* argv[]) {
     
     t_list* lista_instrucciones = leer_pseudocodigo(path);
 
-    //iniciar Server de CPU
-    socket_escucha = iniciar_servidor(puerto_escucha, logger);
-
-    socket_cpu_memoria = esperar_cliente(socket_escucha, logger);
-
-    conexion_con_cpu(socket_cpu_memoria, lista_instrucciones);
     
     // // Pruebas creacion de lista de instrucciones
     // t_instruccion* ins0 = get_ins(lista_instrucciones, 0);
@@ -113,7 +111,8 @@ int main(int argc, char* argv[]) {
     // else {log_info(logger, "LLego otra cosa");}
     // recibir_mensaje(socket_entradasalida_memoria, logger);
 
-    if (socket_cpu_memoria) {liberar_conexion(socket_cpu_memoria);}
+    if (socket_cpu_memoria_dispatch) {liberar_conexion(socket_cpu_memoria_dispatch);}
+    if (socket_cpu_memoria_interrupt) {liberar_conexion(socket_cpu_memoria_interrupt);}
     if (socket_kernel_memoria) {liberar_conexion(socket_kernel_memoria);}
     if (socket_entradasalida_memoria) {liberar_conexion(socket_entradasalida_memoria);}
     if (socket_escucha) {liberar_conexion(socket_escucha);}

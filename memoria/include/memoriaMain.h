@@ -9,7 +9,7 @@
 #include "extern_globales.h"
 #include "inicioMemoria.h"
 #include "Memoria-Kernel.h"
-
+#include "Memoria-EntradaSalida.h"
 
 t_log* logger;
 t_log* logger_debug;

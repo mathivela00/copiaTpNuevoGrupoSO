@@ -1,6 +1,6 @@
 #include "../include/Memoria-Kernel.h"
 
-
+/*
 void atender_conexion_KERNEL_MEMORIA(){
     bool continuarIterando=1;
      t_list* lista;   
@@ -25,7 +25,7 @@ void atender_conexion_KERNEL_MEMORIA(){
                 break;
             }
         }
-
-
 }
+*/
+
 
